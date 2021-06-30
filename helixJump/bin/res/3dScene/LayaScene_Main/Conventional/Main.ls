@@ -477,7 +477,7 @@
 										1
 									],
 									"meshPath":"Assets/Materials/45-node_id3.lm",
-									"enableRender":true,
+									"enableRender":false,
 									"receiveShadows":true,
 									"castShadow":true,
 									"materials":[
@@ -498,7 +498,7 @@
 												"mesh":"Assets/Materials/45-node_id3.lm"
 											}
 										],
-										"isTrigger":false
+										"isTrigger":true
 									}
 								],
 								"child":[]
@@ -694,26 +694,7 @@
 						}
 					]
 				},
-				"components":[
-					{
-						"type":"PhysicsCollider",
-						"restitution":0,
-						"friction":0.5,
-						"rollingFriction":0,
-						"shapes":[
-							{
-								"type":"SphereColliderShape",
-								"center":[
-									0,
-									0,
-									0
-								],
-								"radius":0.5
-							}
-						],
-						"isTrigger":false
-					}
-				],
+				"components":[],
 				"child":[]
 			}
 		]
