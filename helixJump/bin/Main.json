@@ -1,1 +1,1 @@
-{"type":"Scene","props":{"width":1080,"height":1920},"compId":2,"child":[{"type":"Script","props":{"runtime":"scripts/App.ts"},"compId":3}],"loadList":[],"loadList3D":[]}
+{"type":"Scene","props":{"width":1080,"height":1920},"compId":2,"child":[{"type":"Script","props":{"runtime":"scripts/App.ts"},"compId":3},{"type":"Script","props":{"txt_Hint":"@Prefab:prefab/txt_hint.prefab","runtime":"scripts/ScoreHint.ts"},"compId":5}],"loadList":["prefab/txt_hint.prefab"],"loadList3D":[]}

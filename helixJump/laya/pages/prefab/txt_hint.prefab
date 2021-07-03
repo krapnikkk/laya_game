@@ -1,0 +1,1 @@
+{"type":"Text","props":{"text":"+1","name":"txt_hint","color":"#29ff0b","fontSize":96,"x":0,"y":0,"bold":true,"preset":"laya/pages/prefab/txt_hint.prefab","presetID":1,"isPresetRoot":true},"compId":4,"child":[],"isAniNode":true,"nodeParent":2,"searchKey":"Text,txt_hint","label":"txt_hint","isDirectory":false,"hasChild":false,"x":15}
