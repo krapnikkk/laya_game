@@ -17,12 +17,19 @@ export default class Player extends Laya.Script3D {
         this._hitResult = new Laya.HitResult();
 
         Laya.timer.frameLoop(1, this, this.rayCast);
+
+        Laya.stage.on("Continue",this,this.reset);
     }
 
     onEnable(): void {
     }
 
     onDisable(): void {
+    }
+
+    reset(){
+        (this.owner as Laya.Sprite3D).transform.localScaleY = 0.3;
+        (this.owner as Laya.Sprite3D).transform.localPositionY = 0;
     }
 
     private _throughCount: number = 0;
@@ -39,26 +46,30 @@ export default class Player extends Laya.Script3D {
                 (child.meshRenderer.material as Laya.PBRStandardMaterial).albedoColor.z = 1;
             }
         }
-        if (this._physicsSimulation.rayCast(this._ray, this._hitResult, 0.15)) {
+        if (this._physicsSimulation.rayCast(this._ray, this._hitResult, 0.16)) {
             let collider = this._hitResult.collider as Laya.PhysicsTriggerComponent;
             if (collider.owner.name == "Obstacle") {
-                Laya.stage.event("GameOver");
                 (this.owner as Laya.Sprite3D).transform.localScaleY = 0.15;
+                Laya.stage.event("GameOver");
                 return;
             }
             if (collider.isTrigger) {
                 this._throughCount++;
+                Laya.SoundManager.playSound("res/sounds/DestSound.mp3");
                 collider.owner.parent.removeSelf();
                 Laya.Pool.recover("Platform", collider.owner.parent);
                 Laya.stage.event("MoveCamera", (collider.owner.parent as Laya.Sprite3D).transform.localPositionY);
                 Laya.stage.event("SpawnPlatform");
                 if (this._throughCount >= 3) {
                     Laya.stage.event("Hint", 3);
+                    Laya.stage.event("AddScore",3);
                 } else {
                     Laya.stage.event("Hint", 1);
+                    Laya.stage.event("AddScore",1);
                 }
             } else {
                 this._throughCount = 0;
+                Laya.SoundManager.playSound("res/sounds/jumpSound.mp3");
                 this.characterCtrl.jump();
                 Laya.stage.event("SpawnParticle", this._hitResult.point);
 

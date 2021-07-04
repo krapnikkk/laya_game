@@ -5,6 +5,7 @@
         constructor() { super(); }
         onAwake() {
             Laya.stage.on("MoveCamera", this, this.follow);
+            Laya.stage.on("Continue", this, this.reset);
         }
         onEnable() {
         }
@@ -12,6 +13,10 @@
         }
         follow(posY) {
             Laya.Tween.to(this.owner.transform, { localPositionY: posY }, 300);
+        }
+        reset() {
+            console.log("reset");
+            this.owner.transform.localPositionY = 1.3;
         }
     }
 
@@ -30,10 +35,15 @@
             this._ray = new Laya.Ray(new Laya.Vector3(), new Laya.Vector3(0, -1, 0));
             this._hitResult = new Laya.HitResult();
             Laya.timer.frameLoop(1, this, this.rayCast);
+            Laya.stage.on("Continue", this, this.reset);
         }
         onEnable() {
         }
         onDisable() {
+        }
+        reset() {
+            this.owner.transform.localScaleY = 0.3;
+            this.owner.transform.localPositionY = 0;
         }
         rayCast() {
             this._ray.origin = this.owner.transform.position;
@@ -48,23 +58,32 @@
                     child.meshRenderer.material.albedoColor.z = 1;
                 }
             }
-            if (this._physicsSimulation.rayCast(this._ray, this._hitResult, 0.15)) {
+            if (this._physicsSimulation.rayCast(this._ray, this._hitResult, 0.16)) {
                 let collider = this._hitResult.collider;
                 if (collider.owner.name == "Obstacle") {
-                    Laya.stage.event("GameOver");
                     this.owner.transform.localScaleY = 0.15;
+                    Laya.stage.event("GameOver");
                     return;
                 }
                 if (collider.isTrigger) {
                     this._throughCount++;
+                    Laya.SoundManager.playSound("res/sounds/DestSound.mp3");
                     collider.owner.parent.removeSelf();
                     Laya.Pool.recover("Platform", collider.owner.parent);
                     Laya.stage.event("MoveCamera", collider.owner.parent.transform.localPositionY);
                     Laya.stage.event("SpawnPlatform");
-                    Laya.stage.event("Hint", 1);
+                    if (this._throughCount >= 3) {
+                        Laya.stage.event("Hint", 3);
+                        Laya.stage.event("AddScore", 3);
+                    }
+                    else {
+                        Laya.stage.event("Hint", 1);
+                        Laya.stage.event("AddScore", 1);
+                    }
                 }
                 else {
                     this._throughCount = 0;
+                    Laya.SoundManager.playSound("res/sounds/jumpSound.mp3");
                     this.characterCtrl.jump();
                     Laya.stage.event("SpawnParticle", this._hitResult.point);
                 }
@@ -88,6 +107,11 @@
                 Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onMouseUp);
                 Laya.stage.on(Laya.Event.MOUSE_OUT, this, this.onMouseUp);
             }
+            Laya.stage.on("Continue", this, this.reset);
+        }
+        reset() {
+            this._gameOver = false;
+            this.owner.transform.localRotationEulerY = 0;
         }
         onMouseDown(e) {
             this._lastMouseX = Laya.stage.mouseX;
@@ -156,6 +180,7 @@
             this._curIdx = 0;
             this._curPosY = -1;
             this._spanHeight = 1.5;
+            this._platformArr = [];
         }
         onEnable() {
         }
@@ -164,10 +189,25 @@
         init(prefab, parent) {
             this._prefab = prefab;
             this._parent = parent;
+            this.createPlatform();
+            Laya.stage.on("SpawnPlatform", this, this.spawn);
+            Laya.stage.on("Continue", this, this.reset);
+        }
+        reset() {
+            this._platformArr.forEach((item) => {
+                if (item.displayedInStage) {
+                    item.removeSelf();
+                    Laya.Pool.recover("Platform", item);
+                }
+            });
+            this._curIdx = 0;
+            this.createPlatform();
+            this._platformArr = [];
+        }
+        createPlatform() {
             for (let i = 0; i < 5; i++) {
                 this.spawn();
             }
-            Laya.stage.on("SpawnPlatform", this, this.spawn);
         }
         spawn() {
             let sprite3D = Laya.Pool.getItemByCreateFun("Platform", this.create, this);
@@ -175,6 +215,7 @@
             sprite3D.transform.localPosition = new Laya.Vector3(0, posY, 0);
             this._parent.addChild(sprite3D);
             this.emptyPlatform(sprite3D);
+            this._platformArr.push(sprite3D);
             this._curIdx++;
         }
         create() {
@@ -221,6 +262,7 @@
                 child.meshRenderer.material.albedoColor.x = 0;
                 child.meshRenderer.material.albedoColor.y = 0;
                 child.meshRenderer.material.albedoColor.z = 0;
+                child.name = "Bar";
                 if (i == 0 || i == 1) {
                     child.meshRenderer.enable = false;
                     child.getComponent(Laya.PhysicsCollider).isTrigger = true;
@@ -244,28 +286,37 @@
             Laya.Scene3D.load("res/3dScene/LayaScene_Main/Conventional/Main.ls", Laya.Handler.create(this, this.onLoaded));
         }
         onLoaded(scene) {
+            console.time("start");
             Laya.stage.addChild(scene);
+            scene.zOrder = -1;
             let parent = scene.getChildByName("Parent");
             parent.addComponent(Rotation);
-            let player = scene.getChildByName("Player");
-            player.addComponent(Player);
-            let platform = parent.getChildByName("Platform");
-            let platformPrefab = Laya.Sprite3D.instantiate(platform);
-            platform.active = false;
-            this.owner.addComponent(SpawnPlatform).init(platformPrefab, parent);
-            scene.getChildByName("Main Camera").addComponent(FollowCamera);
-            this._column = parent.getChildByName("Column");
-            Laya.stage.on("SpawnPlatform", this, this.moveColumn);
-            let trail = scene.getChildByName("TrailRender");
-            player.addChild(trail);
-            trail.transform.localPosition = new Laya.Vector3();
-            let particle = scene.getChildByName("Particle");
-            let particlePrefab = Laya.Sprite3D.instantiate(particle);
-            particle.active = false;
-            this.owner.addComponent(SpawnParticle).init(particlePrefab, scene);
+            console.timeEnd("start");
+            Laya.stage.on("Continue", this, this.reset);
+            Laya.timer.callLater(this, () => {
+                let platform = parent.getChildByName("Platform");
+                let platformPrefab = Laya.Sprite3D.instantiate(platform);
+                platform.active = false;
+                this.owner.addComponent(SpawnPlatform).init(platformPrefab, parent);
+                scene.getChildByName("Main Camera").addComponent(FollowCamera);
+                this._column = parent.getChildByName("Column");
+                Laya.stage.on("SpawnPlatform", this, this.moveColumn);
+                let player = scene.getChildByName("Player");
+                player.addComponent(Player);
+                let trail = scene.getChildByName("TrailRender");
+                player.addChild(trail);
+                trail.transform.localPosition = new Laya.Vector3();
+                let particle = scene.getChildByName("Particle");
+                let particlePrefab = Laya.Sprite3D.instantiate(particle);
+                particle.active = false;
+                this.owner.addComponent(SpawnParticle).init(particlePrefab, scene);
+            });
         }
         moveColumn() {
             this._column.transform.localPositionY -= 1.5;
+        }
+        reset() {
+            this._column.transform.localPositionY = 0;
         }
         onEnable() {
         }
@@ -286,9 +337,46 @@
             let txt_hint = Laya.Pool.getItemByCreateFun("Hint", this.create, this);
             txt_hint.text = `+${score}`;
             Laya.stage.addChild(txt_hint);
+            txt_hint.pos(250, 650);
+            Laya.Tween.to(txt_hint, { y: 650 - 30 }, 500, Laya.Ease.backIn, Laya.Handler.create(this, () => {
+                txt_hint.removeSelf();
+                Laya.Pool.recover("Hint", txt_hint);
+            }));
         }
         create() {
             return this.txt_Hint.create();
+        }
+    }
+
+    class UIManager extends Laya.Script {
+        constructor() {
+            super();
+            this._score = 0;
+        }
+        onAwake() {
+            Laya.stage.on("AddScore", this, this.addScore);
+            Laya.stage.on("GameOver", this, this.gameOver);
+        }
+        addScore(score) {
+            this._score += score;
+            this.txt_score.text = `${this._score}`;
+        }
+        gameOver() {
+            this.panel_result.visible = true;
+            this.txt_score.visible = false;
+            this.panel_result.getChildByName("txt_result_score").text = `${this._score}`;
+            this.panel_result.getChildByName("btn_continue").on(Laya.Event.CLICK, this, this.onContinue);
+        }
+        onContinue() {
+            this._score = 0;
+            this.txt_score.visible = true;
+            this.panel_result.visible = false;
+            Laya.stage.event("Continue");
+            this.panel_result.getChildByName("btn_continue").off(Laya.Event.CLICK, this, this.onContinue);
+        }
+        onEnable() {
+        }
+        onDisable() {
         }
     }
 
@@ -299,18 +387,19 @@
             var reg = Laya.ClassUtils.regClass;
             reg("scripts/App.ts", App);
             reg("scripts/ScoreHint.ts", ScoreHint);
+            reg("scripts/UIManager.ts", UIManager);
         }
     }
-    GameConfig.width = 640;
-    GameConfig.height = 1136;
+    GameConfig.width = 1080;
+    GameConfig.height = 1920;
     GameConfig.scaleMode = "fixedwidth";
-    GameConfig.screenMode = "none";
+    GameConfig.screenMode = "vertical";
     GameConfig.alignV = "top";
     GameConfig.alignH = "left";
     GameConfig.startScene = "Main.scene";
     GameConfig.sceneRoot = "";
     GameConfig.debug = false;
-    GameConfig.stat = false;
+    GameConfig.stat = true;
     GameConfig.physicsDebug = false;
     GameConfig.exportSceneToJson = true;
     GameConfig.init();

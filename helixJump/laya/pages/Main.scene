@@ -2,11 +2,11 @@
     "x":0,
     "type":"Scene",
     "selectedBox":2,
-    "selecteID":6,
+    "selecteID":12,
     "searchKey":"Scene",
     "props":{"width":1080,"sceneColor":"#000000","height":1920},
     "nodeParent":-1,
-    "maxID":7,
+    "maxID":13,
     "label":"Scene",
     "isOpen":true,
     "isDirectory":true,
@@ -47,6 +47,96 @@
             "compId":5,
             "child":[
                 ]
+        },
+        {
+            "x":15,
+            "type":"Text",
+            "searchKey":"Text,txt_score",
+            "props":{"y":40,"x":40,"text":"0","name":"txt_score","fontSize":120,"color":"#1400ff","bold":true},
+            "nodeParent":2,
+            "label":"txt_score",
+            "isOpen":true,
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":7,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Script",
+            "switchAble":true,
+            "source":"src/scripts/UIManager.ts",
+            "searchKey":"Script,UIManager",
+            "removeAble":true,
+            "props":{"y":0,"x":0,"txt_score":"@node:7","panel_result":"@node:12"},
+            "nodeParent":2,
+            "label":"UIManager",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":8,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Sprite",
+            "searchKey":"Sprite,panel_result",
+            "props":{"y":900,"x":239,"visible":false,"name":"panel_result","mouseEnabled":true},
+            "nodeParent":2,
+            "label":"panel_result",
+            "isOpen":true,
+            "isDirectory":true,
+            "isAniNode":true,
+            "hasChild":true,
+            "compId":12,
+            "child":[
+                {
+                    "x":30,
+                    "type":"Text",
+                    "searchKey":"Text,txt_result_title",
+                    "props":{"text":"game over","strokeColor":"#ffffff","stroke":5,"name":"txt_result_title","fontSize":120,"color":"#ff4700","bold":true},
+                    "nodeParent":12,
+                    "label":"txt_result_title",
+                    "isOpen":true,
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":9,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Text",
+                    "searchKey":"Text,txt_result_score",
+                    "props":{"y":120,"x":267,"text":"0","strokeColor":"#ffffff","stroke":5,"name":"txt_result_score","fontSize":120,"color":"#0047ff","bold":true},
+                    "nodeParent":12,
+                    "label":"txt_result_score",
+                    "isOpen":true,
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":10,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "searchKey":"Button,btn_continue",
+                    "props":{"y":300,"x":114,"width":374,"skin":"comp/button.png","sizeGrid":"13,10,13,10","name":"btn_continue","labelSize":70,"label":"继续游戏","height":105},
+                    "nodeParent":12,
+                    "label":"btn_continue",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":11,
+                    "child":[
+                        ]
+                }]
         }],
     "animations":[
         {

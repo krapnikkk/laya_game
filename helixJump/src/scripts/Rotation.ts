@@ -11,6 +11,12 @@ export default class Rotation extends Laya.Script {
             Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onMouseUp);
             Laya.stage.on(Laya.Event.MOUSE_OUT, this, this.onMouseUp);
         }
+        Laya.stage.on("Continue",this,this.reset);
+    }
+
+    reset(){
+        this._gameOver = false;
+        (this.owner as Laya.Sprite3D).transform.localRotationEulerY=0;
     }
 
     _lastMouseX: number = 0;
