@@ -1,3 +1,4 @@
 .rpt2_cache
 UnityProject
-.laya/**/*
+.laya/chrome
+.laya/_pub_old
