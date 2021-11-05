@@ -46,7 +46,7 @@ export default class Player extends Laya.Script3D {
                 (child.meshRenderer.material as Laya.PBRStandardMaterial).albedoColor.z = 1;
             }
         }
-        if (this._physicsSimulation.rayCast(this._ray, this._hitResult, 0.16)) {
+        if (this._physicsSimulation.rayCast(this._ray, this._hitResult, 0.2)) {
             let collider = this._hitResult.collider as Laya.PhysicsTriggerComponent;
             if (collider.owner.name == "Obstacle") {
                 (this.owner as Laya.Sprite3D).transform.localScaleY = 0.15;
