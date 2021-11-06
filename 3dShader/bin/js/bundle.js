@@ -122,43 +122,48 @@ var polea = (() => {
     })(test = ui2.test || (ui2.test = {}));
   })(ui || (ui = {}));
 
-  // src/shader/VertexUVAniMatrial.ts
-  var _VertexUVAniMatrial = class extends Laya.Material {
+  // src/shader/UVBlurMatrial.ts
+  var _UVBlurMatrial = class extends Laya.Material {
     constructor() {
       super();
-      this.setShaderName("vertexUVAni");
+      this.setShaderName("UVBlur");
       this.albedoColor = new Laya.Vector4(1, 1, 1, 1);
-      this.WH = new Laya.Vector2(4, 4);
+      this.blurWidth = 5e-4;
+      this.speed = 1;
     }
     set albedoColor(value) {
-      this._shaderValues.setVector(_VertexUVAniMatrial.ALBODECOLOR, value);
+      this._shaderValues.setVector(_UVBlurMatrial.ALBODECOLOR, value);
     }
     set albedoTexture(value) {
       if (value) {
-        this._shaderValues.addDefine(_VertexUVAniMatrial.DEFINE_ALBEDOTEXTURE);
-        this._shaderValues.setTexture(_VertexUVAniMatrial.ALBODETEXTURE, value);
+        this._shaderValues.addDefine(_UVBlurMatrial.DEFINE_ALBEDOTEXTURE);
+        this._shaderValues.setTexture(_UVBlurMatrial.ALBODETEXTURE, value);
       } else {
-        this._shaderValues.removeDefine(_VertexUVAniMatrial.DEFINE_ALBEDOTEXTURE);
+        this._shaderValues.removeDefine(_UVBlurMatrial.DEFINE_ALBEDOTEXTURE);
       }
     }
-    set WH(value) {
-      this._shaderValues.setVector2(_VertexUVAniMatrial.WH, value);
+    set speed(value) {
+      this._shaderValues.setNumber(_UVBlurMatrial.SPEED, value);
+    }
+    set blurWidth(value) {
+      this._shaderValues.setNumber(_UVBlurMatrial.BLURWIDTH, value);
     }
   };
-  var VertexUVAniMatrial = _VertexUVAniMatrial;
-  VertexUVAniMatrial.ALBODETEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
-  VertexUVAniMatrial.ALBODECOLOR = Laya.Shader3D.propertyNameToID("u_AlbedoColor");
-  VertexUVAniMatrial.WH = Laya.Shader3D.propertyNameToID("u_WH");
-  VertexUVAniMatrial.DEFINE_ALBEDOTEXTURE = Laya.Shader3D.getDefineByName("ALBEDOTEXTURE");
+  var UVBlurMatrial = _UVBlurMatrial;
+  UVBlurMatrial.ALBODETEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
+  UVBlurMatrial.ALBODECOLOR = Laya.Shader3D.propertyNameToID("u_AlbedoColor");
+  UVBlurMatrial.BLURWIDTH = Laya.Shader3D.propertyNameToID("u_BlurWidth");
+  UVBlurMatrial.SPEED = Laya.Shader3D.propertyNameToID("u_Speed");
+  UVBlurMatrial.DEFINE_ALBEDOTEXTURE = Laya.Shader3D.getDefineByName("ALBEDOTEXTURE");
 
-  // src/shader/vertexUVAni.vs
-  var vertexUVAni_default = '#include "Lighting.glsl";\n\n#ifdef GPU_INSTANCE\nattribute mat4 a_MvpMatrix;\n#else\nuniform mat4 u_MvpMatrix;\n#endif\n\nattribute vec4 a_Position;\nattribute vec4 a_Color;\nattribute vec2 a_TexCoord0;\n\nuniform vec4 u_TilingOffset;\n\nvarying vec4 v_Color;\nvarying vec2 v_TexCoord0;\n\nvoid main() {\n  v_Color = a_Color;\n  // v_TexCoord0 = a_TexCoord0;\n  v_TexCoord0 = a_TexCoord0 ;\n\n#ifdef GPU_INSTANCE\n  gl_Position = a_MvpMatrix * a_Position;\n#else\n  gl_Position = u_MvpMatrix * a_Position;\n#endif\n\n  gl_Position = remapGLPositionZ(gl_Position);\n}\n';
+  // src/shader/UVBlur.vs
+  var UVBlur_default = '#include "Lighting.glsl";\n\n#ifdef GPU_INSTANCE\nattribute mat4 a_MvpMatrix;\n#else\nuniform mat4 u_MvpMatrix;\n#endif\n\nattribute vec4 a_Position;\nattribute vec4 a_Color;\nattribute vec2 a_TexCoord0;\n\nvarying vec4 v_Color;\nvarying vec2 v_TexCoord0;\n\nvoid main() {\n  v_Color = a_Color;\n  v_TexCoord0 = a_TexCoord0 ;\n\n#ifdef GPU_INSTANCE\n  gl_Position = a_MvpMatrix * a_Position;\n#else\n  gl_Position = u_MvpMatrix * a_Position;\n#endif\n\n  gl_Position = remapGLPositionZ(gl_Position);\n}\n';
 
-  // src/shader/vertexUVAni.fs
-  var vertexUVAni_default2 = "#ifdef GL_FRAGMENT_PRECISION_HIGHP\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n\nuniform vec4 u_AlbedoColor;\nuniform vec2 u_WH;\nuniform float u_Time;\n\nvarying vec4 v_Color;\nvarying vec2 v_TexCoord0;\n\n#ifdef ALBEDOTEXTURE\nuniform sampler2D u_AlbedoTexture;\n#endif\nvoid main() {\n  vec4 color = u_AlbedoColor;\n\n    #ifdef ALBEDOTEXTURE\n        float index = 4.0;\n        index = floor(u_Time * 10.0);\n\n        float uSize = 1.0/u_WH.x;\n        float vSize = 1.0/u_WH.x;\n\n        float uCount = mod(index,u_WH.x);\n        float vCount = floor(index / u_WH.y);\n\n        vec2 texCoord = vec2(0.0);\n        texCoord.x = v_TexCoord0.x / u_WH.x + uCount * uSize;\n        texCoord.y = v_TexCoord0.y / u_WH.y + uCount * vSize;\n\n\n        color = texture2D(u_AlbedoTexture,texCoord);\n    #endif\n  gl_FragColor = color;\n}";
+  // src/shader/UVBlur.fs
+  var UVBlur_default2 = "#ifdef GL_FRAGMENT_PRECISION_HIGHP\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n\nuniform vec4 u_AlbedoColor;\nuniform float u_BlurWidth;\nuniform float u_Speed;\nuniform float u_Time;\n\nvarying vec4 v_Color;\nvarying vec2 v_TexCoord0;\n\n#ifdef ALBEDOTEXTURE\nuniform sampler2D u_AlbedoTexture;\n#endif\nvoid main() {\n  vec4 color = u_AlbedoColor;\n\n    #ifdef ALBEDOTEXTURE\n      // color *= texture2D(u_AlbedoTexture,v_TexCoord0);\n\n      // vec2 uv = v_TexCoord0;\n\n      // uv.x = clamp(v_TexCoord0.x + u_BlurWidth,0.0,1.0);\n      // // \u4E8C\u6B21\u91C7\u6837\n      // color += texture2D(u_AlbedoTexture,uv);\n\n      // uv.x = clamp(v_TexCoord0.x - u_BlurWidth,0.0,1.0);\n      // color += texture2D(u_AlbedoTexture,uv);\n\n      // uv.x = v_TexCoord0.x;\n\n      // uv.y = clamp(v_TexCoord0.y + u_BlurWidth,0.0,1.0);\n      // color += texture2D(u_AlbedoTexture,uv);\n\n      // uv.y = clamp(v_TexCoord0.y - u_BlurWidth,0.0,1.0);\n      // color += texture2D(u_AlbedoTexture,uv);\n\n      // color /= 5.0;// \u4E94\u6B21\u7EB9\u7406\u91C7\u6837\n\n      // \u5FAA\u73AF\u91C7\u6837\n      color = vec4(0.0);\n      float f = 0.0;\n      vec2 op = vec2(0.0);\n      vec2 textCoord = vec2(0.0);\n      float tot = 0.0;\n\n      for(int i = -5;i<5;i++){\n          for(int j = -5;j<5;j++){\n              vec2 vp = vec2(float(i),float(j));\n              float dis = distance(vp,op); // 0\uFF5E1\n              f = 1.1 - dis / 8.0; // \u6700\u5C111.0 \u6700\u591A1.1\n              tot += f;\n\n              textCoord.x = v_TexCoord0.x + u_BlurWidth * float(j);\n              textCoord.y = v_TexCoord0.y + u_BlurWidth * float(i);\n\n              color += texture2D(u_AlbedoTexture,textCoord) * f;\n          }\n      }\n      color /= tot;\n    #endif\n  gl_FragColor = color;\n}";
 
-  // src/shader/VertexUVAniShader.ts
-  var VertexUVAniShader = class {
+  // src/shader/UVBlurShader.ts
+  var UVBlurShader = class {
     static initShader() {
       let attributeMap = {
         "a_Position": Laya.VertexMesh.MESH_POSITION0,
@@ -168,15 +173,16 @@ var polea = (() => {
       };
       let uniformMap = {
         "u_MvpMatrix": Laya.Shader3D.PERIOD_SPRITE,
+        "u_Speed": Laya.Shader3D.PERIOD_MATERIAL,
+        "u_Width": Laya.Shader3D.PERIOD_MATERIAL,
         "u_AlbedoTexture": Laya.Shader3D.PERIOD_MATERIAL,
         "u_AlbedoColor": Laya.Shader3D.PERIOD_MATERIAL,
-        "u_WH": Laya.Shader3D.PERIOD_MATERIAL,
-        "u_Time": Laya.Shader3D.PERIOD_SCENE
+        "u_BlurWidth": Laya.Shader3D.PERIOD_MATERIAL
       };
-      let shader = Laya.Shader3D.add("vertexUVAni");
+      let shader = Laya.Shader3D.add("UVBlur");
       let subShader = new Laya.SubShader(attributeMap, uniformMap);
       shader.addSubShader(subShader);
-      subShader.addShaderPass(vertexUVAni_default, vertexUVAni_default2);
+      subShader.addShaderPass(UVBlur_default, UVBlur_default2);
     }
   };
 
@@ -192,20 +198,26 @@ var polea = (() => {
       directionLight.transform.worldMatrix.setForward(new Laya.Vector3(1, -1, 0));
       camera.transform.translate(new Laya.Vector3(0, 3, 3));
       camera.transform.rotate(new Laya.Vector3(0, 0, 0), true, false);
-      VertexUVAniShader.initShader();
+      UVBlurShader.initShader();
       let meshData = BoxMesh.createBox(1.5, 1.5, 1);
       this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh()));
       this.box.transform.position = new Laya.Vector3(0, 3, 0);
-      let material = new VertexUVAniMatrial();
-      Laya.Texture2D.load("res/animation.png", Laya.Handler.create(this, (text) => {
+      let material = new UVBlurMatrial();
+      Laya.Texture2D.load("res/blur.png", Laya.Handler.create(this, (text) => {
         material.albedoTexture = text;
       }));
       this.box.meshRenderer.material = material;
+      this.slider_width.on(Laya.Event.CHANGED, this, this.onSliderBlurWidthChange);
     }
     onSliderWidthChange() {
       let v = this.slider_width.value / 100;
       let material = this.box.meshRenderer.sharedMaterial;
       material.width = v;
+    }
+    onSliderBlurWidthChange() {
+      let v = this.slider_width.value / 1e4;
+      let material = this.box.meshRenderer.sharedMaterial;
+      material.blurWidth = v;
     }
     onSliderSpeedChange() {
       let v = this.slider_speed.value / 100;

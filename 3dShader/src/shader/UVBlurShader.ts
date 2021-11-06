@@ -1,6 +1,6 @@
-import verticesShader from "./UVWater.vs";
-import fragmentShader from "./UVWater.fs";
-export default class UVWaterShader {
+import verticesShader from "./UVBlur.vs";
+import fragmentShader from "./UVBlur.fs";
+export default class UVBlurShader {
     public static initShader(): void {
         let attributeMap = {
             "a_Position":Laya.VertexMesh.MESH_POSITION0,
@@ -14,9 +14,9 @@ export default class UVWaterShader {
             "u_Width":Laya.Shader3D.PERIOD_MATERIAL,
             "u_AlbedoTexture":Laya.Shader3D.PERIOD_MATERIAL,
             "u_AlbedoColor":Laya.Shader3D.PERIOD_MATERIAL,
-            "u_Time":Laya.Shader3D.PERIOD_SCENE
+            "u_BlurWidth":Laya.Shader3D.PERIOD_MATERIAL
         };
-        let shader = Laya.Shader3D.add("UVWater");
+        let shader = Laya.Shader3D.add("UVBlur");
 
         let subShader = new Laya.SubShader(attributeMap, uniformMap);
 
