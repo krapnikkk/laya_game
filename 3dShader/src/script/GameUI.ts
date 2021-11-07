@@ -20,6 +20,8 @@ import UVWaterMatrial from "../shader/UVWaterMatrial";
 import UVWaterShader from "../shader/UVWaterShader";
 import UVBlurMatrial from "../shader/UVBlurMatrial";
 import UVBlurShader from "../shader/UVBlurShader";
+import UVMosaicMatrial from "../shader/UVMosaicMatrial";
+import UVMosaicShader from "../shader/UVMosaicShader";
 /**
  * 本示例采用非脚本的方式实现，而使用继承页面基类，实现页面逻辑。在IDE里面设置场景的Runtime属性即可和场景进行关联
  * 相比脚本方式，继承式页面类，可以直接使用页面定义的属性（通过IDE内var属性定义），比如this.tipLbll，this.scoreLbl，具有代码提示效果
@@ -154,21 +156,40 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box.meshRenderer.material = material;
 
         // UVBlur
+        // camera.transform.translate(new Laya.Vector3(0, 3, 3));
+        // camera.transform.rotate(new Laya.Vector3(0, 0, 0), true, false);
+        // UVBlurShader.initShader();
+
+        // let meshData =  BoxMesh.createBox(1.5,1.5,1);
+        // this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh())) as Laya.MeshSprite3D;
+        // this.box.transform.position = new Laya.Vector3(0, 3, 0);
+
+        // let material = new UVBlurMatrial();
+        // Laya.Texture2D.load("res/blur.png",Laya.Handler.create(this,(text)=>{
+        //     material.albedoTexture = text;
+        // }))
+
+        // this.box.meshRenderer.material = material;
+        // this.slider_width.on(Laya.Event.CHANGED,this,this.onSliderBlurWidthChange);
+
+        // UVMosaic
         camera.transform.translate(new Laya.Vector3(0, 3, 3));
         camera.transform.rotate(new Laya.Vector3(0, 0, 0), true, false);
-        UVBlurShader.initShader();
+        UVMosaicShader.initShader();
 
         let meshData =  BoxMesh.createBox(1.5,1.5,1);
         this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh())) as Laya.MeshSprite3D;
         this.box.transform.position = new Laya.Vector3(0, 3, 0);
 
-        let material = new UVBlurMatrial();
+        let material = new UVMosaicMatrial();
         Laya.Texture2D.load("res/blur.png",Laya.Handler.create(this,(text)=>{
             material.albedoTexture = text;
+            material.texSize = new Laya.Vector2(512,512);
+            material.mosaicSize = 8.0;
         }))
+        this.slider_width.on(Laya.Event.CHANGED,this,this.onSliderMosaicChange);
 
         this.box.meshRenderer.material = material;
-        this.slider_width.on(Laya.Event.CHANGED,this,this.onSliderBlurWidthChange);
     }
 
     box: Laya.MeshSprite3D;
@@ -188,6 +209,12 @@ export default class GameUI extends ui.test.TestSceneUI {
         let v = this.slider_speed.value / 100;
         let material: VertexWaveMatrial = this.box.meshRenderer.sharedMaterial as VertexWaveMatrial;
         material.speed = v;
+    }
+
+    private onSliderMosaicChange() {
+        let v = this.slider_width.value / 100 * 20 + 5;
+        let material: UVMosaicMatrial = this.box.meshRenderer.sharedMaterial as UVMosaicMatrial;
+        material.mosaicSize = v;
     }
 
 }
