@@ -24,6 +24,8 @@ import UVMosaicMatrial from "../shader/UVMosaicMatrial";
 import UVMosaicShader from "../shader/UVMosaicShader";
 import TerrainMatrial from "../shader/TerrainMatrial";
 import TerrainShader from "../shader/TerrainShader";
+import LightingMaterial from "../shader/LightingMaterial";
+import LightingShader from "../shader/LightingShader";
 /**
  * 本示例采用非脚本的方式实现，而使用继承页面基类，实现页面逻辑。在IDE里面设置场景的Runtime属性即可和场景进行关联
  * 相比脚本方式，继承式页面类，可以直接使用页面定义的属性（通过IDE内var属性定义），比如this.tipLbll，this.scoreLbl，具有代码提示效果
@@ -195,13 +197,26 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box.meshRenderer.material = material;
 
         // Terrain
+        // camera.transform.translate(new Laya.Vector3(0, 8, 8));
+        // camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
+        // Laya.loader.create([
+        //     "res/bg1.jpg",
+        //     "res/bg2.jpg",
+        // ], Laya.Handler.create(this, this.onLoadComplete));
 
-        camera.transform.translate(new Laya.Vector3(0, 8, 8));
+        // lighting
+        camera.transform.translate(new Laya.Vector3(0, 3, 3));
         camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-        Laya.loader.create([
-            "res/bg1.jpg",
-            "res/bg2.jpg",
-        ], Laya.Handler.create(this, this.onLoadComplete));
+        var earth = this.gameScene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(1.5 , 64 , 64))) as Laya.MeshSprite3D;
+        earth.transform.position = new Laya.Vector3(0 , 0 , -3);
+        LightingShader.initShader();
+        var material:LightingMaterial = new LightingMaterial();
+        Laya.Texture2D.load("res/layabox.png", Laya.Handler.create(null, function(tex:Laya.Texture2D) {
+            material.albedoTexture = tex;
+        }));
+        // material.albedoColor = new Laya.Vector4(1,1,1,1);
+        
+        earth.meshRenderer.material = material;
     }
 
     private onLoadComplete() {
