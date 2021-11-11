@@ -1,4 +1,4 @@
-export default class VertexColorMatrial extends Laya.Material{
+export default class VertexColorMaterial extends Laya.Material{
     // public static ALBEDOCOLOR = Laya.Shader3D.propertyNameToID("u_AlbedoColor");
     // public static DEFINE_ALBEDOCOLOR = Laya.Shader3D.getDefineByName("ALBEDOCOLOR");
     constructor(){

@@ -1,4 +1,4 @@
-export default class UVMosaicMatrial extends Laya.Material {
+export default class UVMosaicMaterial extends Laya.Material {
 
     public static ALBODETEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
     public static ALBODECOLOR = Laya.Shader3D.propertyNameToID("u_AlbedoColor");
@@ -16,24 +16,24 @@ export default class UVMosaicMatrial extends Laya.Material {
     }
 
     public set albedoColor(value: Laya.Vector4) {
-        this._shaderValues.setVector(UVMosaicMatrial.ALBODECOLOR, value);
+        this._shaderValues.setVector(UVMosaicMaterial.ALBODECOLOR, value);
     }
 
     public set albedoTexture(value: Laya.BaseTexture) {
         if (value) {
-            this._shaderValues.addDefine(UVMosaicMatrial.DEFINE_ALBEDOTEXTURE);
-            this._shaderValues.setTexture(UVMosaicMatrial.ALBODETEXTURE, value);
+            this._shaderValues.addDefine(UVMosaicMaterial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.setTexture(UVMosaicMaterial.ALBODETEXTURE, value);
         } else {
-            this._shaderValues.removeDefine(UVMosaicMatrial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.removeDefine(UVMosaicMaterial.DEFINE_ALBEDOTEXTURE);
         }
     }
 
     public set mosaicSize(value:number){
-        this._shaderValues.setNumber(UVMosaicMatrial.MOSAICSIZE,value);
+        this._shaderValues.setNumber(UVMosaicMaterial.MOSAICSIZE,value);
     }
 
     public set texSize(value:Laya.Vector2){
-        this._shaderValues.setVector2(UVMosaicMatrial.TEXSIZE,value);
+        this._shaderValues.setVector2(UVMosaicMaterial.TEXSIZE,value);
     }
 
 }

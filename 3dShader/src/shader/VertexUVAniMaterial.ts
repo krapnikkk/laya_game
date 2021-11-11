@@ -1,4 +1,4 @@
-export default class VertexUVAniMatrial extends Laya.Material {
+export default class VertexUVAniMaterial extends Laya.Material {
 
     public static ALBODETEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
     public static ALBODECOLOR = Laya.Shader3D.propertyNameToID("u_AlbedoColor");
@@ -15,20 +15,20 @@ export default class VertexUVAniMatrial extends Laya.Material {
     }
 
     public set albedoColor(value: Laya.Vector4) {
-        this._shaderValues.setVector(VertexUVAniMatrial.ALBODECOLOR, value);
+        this._shaderValues.setVector(VertexUVAniMaterial.ALBODECOLOR, value);
     }
 
     public set albedoTexture(value: Laya.BaseTexture) {
         if (value) {
-            this._shaderValues.addDefine(VertexUVAniMatrial.DEFINE_ALBEDOTEXTURE);
-            this._shaderValues.setTexture(VertexUVAniMatrial.ALBODETEXTURE, value);
+            this._shaderValues.addDefine(VertexUVAniMaterial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.setTexture(VertexUVAniMaterial.ALBODETEXTURE, value);
         } else {
-            this._shaderValues.removeDefine(VertexUVAniMatrial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.removeDefine(VertexUVAniMaterial.DEFINE_ALBEDOTEXTURE);
         }
     }
 
     public set WH(value:Laya.Vector2){
-        this._shaderValues.setVector2(VertexUVAniMatrial.WH,value)
+        this._shaderValues.setVector2(VertexUVAniMaterial.WH,value)
     }
 
 }

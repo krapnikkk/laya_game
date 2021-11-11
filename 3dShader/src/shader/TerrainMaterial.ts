@@ -1,4 +1,4 @@
-export default class TerrainMatrial extends Laya.Material {
+export default class TerrainMaterial extends Laya.Material {
 
     public static ALBODETEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
     public static ALBODECOLOR = Laya.Shader3D.propertyNameToID("u_AlbedoColor");
@@ -17,24 +17,24 @@ export default class TerrainMatrial extends Laya.Material {
     }
 
     public set albedoColor(value: Laya.Vector4) {
-        this._shaderValues.setVector(TerrainMatrial.ALBODECOLOR, value);
+        this._shaderValues.setVector(TerrainMaterial.ALBODECOLOR, value);
     }
 
     public set albedoTexture(value: Laya.BaseTexture) {
         if (value) {
-            this._shaderValues.addDefine(TerrainMatrial.DEFINE_ALBEDOTEXTURE);
-            this._shaderValues.setTexture(TerrainMatrial.ALBODETEXTURE, value);
+            this._shaderValues.addDefine(TerrainMaterial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.setTexture(TerrainMaterial.ALBODETEXTURE, value);
         } else {
-            this._shaderValues.removeDefine(TerrainMatrial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.removeDefine(TerrainMaterial.DEFINE_ALBEDOTEXTURE);
         }
     }
 
     public set secondTexture(value: Laya.BaseTexture){
         if (value) {
-            this._shaderValues.addDefine(TerrainMatrial.DEFINE_SECONDTEXTURE);
-            this._shaderValues.setTexture(TerrainMatrial.SECONDTEXTURE, value);
+            this._shaderValues.addDefine(TerrainMaterial.DEFINE_SECONDTEXTURE);
+            this._shaderValues.setTexture(TerrainMaterial.SECONDTEXTURE, value);
         } else {
-            this._shaderValues.removeDefine(TerrainMatrial.DEFINE_SECONDTEXTURE);
+            this._shaderValues.removeDefine(TerrainMaterial.DEFINE_SECONDTEXTURE);
         }
     }
 

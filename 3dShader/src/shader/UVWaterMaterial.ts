@@ -1,4 +1,4 @@
-export default class UVWaterMatrial extends Laya.Material {
+export default class UVWaterMaterial extends Laya.Material {
 
     public static ALBODETEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
     public static ALBODECOLOR = Laya.Shader3D.propertyNameToID("u_AlbedoColor");
@@ -17,24 +17,24 @@ export default class UVWaterMatrial extends Laya.Material {
     }
 
     public set albedoColor(value: Laya.Vector4) {
-        this._shaderValues.setVector(UVWaterMatrial.ALBODECOLOR, value);
+        this._shaderValues.setVector(UVWaterMaterial.ALBODECOLOR, value);
     }
 
     public set albedoTexture(value: Laya.BaseTexture) {
         if (value) {
-            this._shaderValues.addDefine(UVWaterMatrial.DEFINE_ALBEDOTEXTURE);
-            this._shaderValues.setTexture(UVWaterMatrial.ALBODETEXTURE, value);
+            this._shaderValues.addDefine(UVWaterMaterial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.setTexture(UVWaterMaterial.ALBODETEXTURE, value);
         } else {
-            this._shaderValues.removeDefine(UVWaterMatrial.DEFINE_ALBEDOTEXTURE);
+            this._shaderValues.removeDefine(UVWaterMaterial.DEFINE_ALBEDOTEXTURE);
         }
     }
 
     public set speed(value:number){
-        this._shaderValues.setNumber(UVWaterMatrial.SPEED,value);
+        this._shaderValues.setNumber(UVWaterMaterial.SPEED,value);
     }
 
     public set width(value:number){
-        this._shaderValues.setNumber(UVWaterMatrial.WIDTH,value);
+        this._shaderValues.setNumber(UVWaterMaterial.WIDTH,value);
     }
 
 }

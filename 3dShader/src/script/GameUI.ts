@@ -1,28 +1,28 @@
 import BoxMesh from "../mesh/BoxMesh";
 import HollowCylinderMesh from "../mesh/HollowCylinderMesh";
 import MeshData from "../mesh/MeshData";
-import GerstnerWaveMatrial from "../shader/GerstnerWaveMatrial";
+import GerstnerWaveMaterial from "../shader/GerstnerWaveMaterial";
 import GerstnerWaveShader from "../shader/GerstnerWaveShader";
-import NormalMoveMatrial from "../shader/NormalMoveMatrial";
+import NormalMoveMaterial from "../shader/NormalMoveMaterial";
 import NormalMoveShader from "../shader/NormalMoveShader";
 import Shader from "../shader/Shader";
-import VertexColorMatrial from "../shader/VertexColorMatrial";
+import VertexColorMaterial from "../shader/VertexColorMaterial";
 import VertexColorShader from "../shader/VertexColorShader";
-import VertexUVMatrial from "../shader/VertexUVMatrial";
+import VertexUVMaterial from "../shader/VertexUVMaterial";
 import VertexUVShader from "../shader/VertexUVShader";
-import VertexWaveMatrial from "../shader/VertexWaveMatrial";
+import VertexWaveMaterial from "../shader/VertexWaveMaterial";
 import VertexWaveShader from "../shader/VertexWaveShader";
 import { ui } from "./../ui/layaMaxUI";
 import Rotation from "./Rotation";
-import VertexUVAniMatrial from "../shader/VertexUVAniMatrial";
+import VertexUVAniMaterial from "../shader/VertexUVAniMaterial";
 import VertexUVAniShader from "../shader/VertexUVAniShader";
-import UVWaterMatrial from "../shader/UVWaterMatrial";
+import UVWaterMaterial from "../shader/UVWaterMaterial";
 import UVWaterShader from "../shader/UVWaterShader";
-import UVBlurMatrial from "../shader/UVBlurMatrial";
+import UVBlurMaterial from "../shader/UVBlurMaterial";
 import UVBlurShader from "../shader/UVBlurShader";
-import UVMosaicMatrial from "../shader/UVMosaicMatrial";
+import UVMosaicMaterial from "../shader/UVMosaicMaterial";
 import UVMosaicShader from "../shader/UVMosaicShader";
-import TerrainMatrial from "../shader/TerrainMatrial";
+import TerrainMaterial from "../shader/TerrainMaterial";
 import TerrainShader from "../shader/TerrainShader";
 import LightingMaterial from "../shader/LightingMaterial";
 import LightingShader from "../shader/LightingShader";
@@ -76,7 +76,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // let box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(1, 64, 64))) as Laya.MeshSprite3D;
         // box.transform.position = new Laya.Vector3(0,3,-1);
 
-        // let material = new VertexColorMatrial();
+        // let material = new VertexColorMaterial();
         // box.meshRenderer.material = material;
 
         // VertexWave
@@ -86,7 +86,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 200,20))) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0,0,-5);
 
-        // let material = new VertexWaveMatrial();
+        // let material = new VertexWaveMaterial();
         // this.box.meshRenderer.material = material;
         // this.slider_width.on(Laya.Event.CHANGED,this,this.onSliderWidthChange);
         // this.slider_speed.on(Laya.Event.CHANGED,this,this.onSliderSpeedChange);
@@ -98,7 +98,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 200, 20))) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0, 0, -5);
 
-        // let material = new GerstnerWaveMatrial();
+        // let material = new GerstnerWaveMaterial();
         // this.box.meshRenderer.material = material;
 
         //  NormalMove
@@ -108,7 +108,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(1, 32, 32))) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0, 2, 0);
 
-        // let material = new NormalMoveMatrial();
+        // let material = new NormalMoveMaterial();
         // this.box.meshRenderer.material = material;
 
         // VertexUV
@@ -120,7 +120,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh())) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0, 3, 0);
 
-        // let material = new VertexUVMatrial();
+        // let material = new VertexUVMaterial();
         // Laya.Texture2D.load("res/layabox.png",Laya.Handler.create(this,(text)=>{
         //     material.albedoTexture = text;
         //     material.tilingOffset = new Laya.Vector4(2,2,0.5,0.5);
@@ -137,7 +137,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh())) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0, 3, 0);
 
-        // let material = new VertexUVAniMatrial();
+        // let material = new VertexUVAniMaterial();
         // Laya.Texture2D.load("res/animation.png",Laya.Handler.create(this,(text)=>{
         //     material.albedoTexture = text;
         // }))
@@ -153,7 +153,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh())) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0, 3, 0);
 
-        // let material = new UVWaterMatrial();
+        // let material = new UVWaterMaterial();
         // Laya.Texture2D.load("res/water.png",Laya.Handler.create(this,(text)=>{
         //     material.albedoTexture = text;
         // }))
@@ -169,7 +169,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh())) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0, 3, 0);
 
-        // let material = new UVBlurMatrial();
+        // let material = new UVBlurMaterial();
         // Laya.Texture2D.load("res/blur.png",Laya.Handler.create(this,(text)=>{
         //     material.albedoTexture = text;
         // }))
@@ -186,7 +186,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // this.box = scene.addChild(new Laya.MeshSprite3D(meshData.createMesh())) as Laya.MeshSprite3D;
         // this.box.transform.position = new Laya.Vector3(0, 3, 0);
 
-        // let material = new UVMosaicMatrial();
+        // let material = new UVMosaicMaterial();
         // Laya.Texture2D.load("res/blur.png",Laya.Handler.create(this,(text)=>{
         //     material.albedoTexture = text;
         //     material.texSize = new Laya.Vector2(512,512);
@@ -225,7 +225,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         this.box = this.gameScene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 200,20))) as Laya.MeshSprite3D;
         this.box.transform.position = new Laya.Vector3(0, 0, -7);
 
-        let material = new TerrainMatrial();
+        let material = new TerrainMaterial();
 
         material.albedoTexture = Laya.loader.getRes("res/bg1.jpg");
         material.secondTexture = Laya.loader.getRes("res/bg2.jpg");
@@ -239,25 +239,25 @@ export default class GameUI extends ui.test.TestSceneUI {
     box: Laya.MeshSprite3D;
     private onSliderWidthChange() {
         let v = this.slider_width.value / 100;
-        let material: VertexWaveMatrial = this.box.meshRenderer.sharedMaterial as VertexWaveMatrial;
+        let material: VertexWaveMaterial = this.box.meshRenderer.sharedMaterial as VertexWaveMaterial;
         material.width = v;
     }
 
     private onSliderBlurWidthChange() {
         let v = this.slider_width.value / 10000;
-        let material: UVBlurMatrial = this.box.meshRenderer.sharedMaterial as UVBlurMatrial;
+        let material: UVBlurMaterial = this.box.meshRenderer.sharedMaterial as UVBlurMaterial;
         material.blurWidth = v;
     }
 
     private onSliderSpeedChange() {
         let v = this.slider_speed.value / 100;
-        let material: VertexWaveMatrial = this.box.meshRenderer.sharedMaterial as VertexWaveMatrial;
+        let material: VertexWaveMaterial = this.box.meshRenderer.sharedMaterial as VertexWaveMaterial;
         material.speed = v;
     }
 
     private onSliderMosaicChange() {
         let v = this.slider_width.value / 100 * 20 + 5;
-        let material: UVMosaicMatrial = this.box.meshRenderer.sharedMaterial as UVMosaicMatrial;
+        let material: UVMosaicMaterial = this.box.meshRenderer.sharedMaterial as UVMosaicMaterial;
         material.mosaicSize = v;
     }
 

@@ -1,4 +1,4 @@
-export default class VertexUVMatrial extends Laya.Material {
+export default class VertexUVMaterial extends Laya.Material {
 
     public static ALBODETEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
     public static TILINGOFFSET = Laya.Shader3D.propertyNameToID("u_TilingOffset");
@@ -9,10 +9,10 @@ export default class VertexUVMatrial extends Laya.Material {
     }
 
     public set albedoTexture(value: Laya.BaseTexture) {
-        this._shaderValues.setTexture(VertexUVMatrial.ALBODETEXTURE, value);
+        this._shaderValues.setTexture(VertexUVMaterial.ALBODETEXTURE, value);
     }
 
     public set tilingOffset(value:Laya.Vector4){
-        this._shaderValues.setVector(VertexUVMatrial.TILINGOFFSET,value);
+        this._shaderValues.setVector(VertexUVMaterial.TILINGOFFSET,value);
     }
 }
