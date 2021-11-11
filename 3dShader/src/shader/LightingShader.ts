@@ -17,6 +17,7 @@ export default class LightingShader {
             "u_AlbedoColor":Laya.Shader3D.PERIOD_MATERIAL,
             "u_AlbedoTexture":Laya.Shader3D.PERIOD_MATERIAL,
 
+            "u_AmbientColor":Laya.Shader3D.PERIOD_SCENE,
             "u_DirationLightCount":Laya.Shader3D.PERIOD_SCENE,
             "u_LightBuffer":Laya.Shader3D.PERIOD_SCENE
         };

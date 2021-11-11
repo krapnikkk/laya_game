@@ -205,6 +205,7 @@ export default class GameUI extends ui.test.TestSceneUI {
         // ], Laya.Handler.create(this, this.onLoadComplete));
 
         // lighting
+        scene.ambientColor = new Laya.Vector3(0.1, 0.1, 0.0);
         camera.transform.translate(new Laya.Vector3(0, 3, 3));
         camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
         var earth = this.gameScene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(1.5 , 64 , 64))) as Laya.MeshSprite3D;

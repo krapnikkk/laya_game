@@ -7,6 +7,7 @@ precision mediump float;
 #include "Lighting.glsl";
 
 uniform vec4 u_AlbedoColor;
+uniform vec4 u_AmbientColor; // 环境光
 
 uniform int u_DirationLightCount;
 
@@ -30,24 +31,22 @@ void main() {
 
   vec3 diffuse = vec3(0.0);
 
-  DirectionLight directionLight;
-  float ln;
-
   for(int i = 0;i<20;i++){
     if(i>=u_DirationLightCount){
         break;
     }
 
-    directionLight = getDirectionLight(u_LightBuffer,i);
+    DirectionLight directionLight = getDirectionLight(u_LightBuffer,i);
     
-    ln = dot(v_Normal,directionLight.direction*-1.0);
-    ln = max(ln,0.0);
+    float ln = dot(v_Normal,directionLight.direction*-1.0);
+    ln = max(ln,0.0); // 兰伯特模型
+    // ln = ln * 0.5 + 0.5; // -1~1 -> 0~1 半兰伯特
 
     diffuse += directionLight.color * ln;
     
   }
 
-  mainColor = vec4(mainColor.rgb * diffuse,mainColor.a);
+  mainColor = vec4(mainColor.rgb * (u_AmbientColor.rgb + diffuse),mainColor.a);
 
   gl_FragColor = mainColor;
 }
