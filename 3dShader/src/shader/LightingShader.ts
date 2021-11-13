@@ -13,9 +13,12 @@ export default class LightingShader {
         let uniformMap = {
             "u_MvpMatrix":Laya.Shader3D.PERIOD_SPRITE,
             "u_WorldMat":Laya.Shader3D.PERIOD_SPRITE,
+            "u_CameraPos":Laya.Shader3D.PERIOD_CAMERA,
 
             "u_AlbedoColor":Laya.Shader3D.PERIOD_MATERIAL,
             "u_AlbedoTexture":Laya.Shader3D.PERIOD_MATERIAL,
+            "u_Shininess":Laya.Shader3D.PERIOD_MATERIAL,
+            "u_SpecularColor":Laya.Shader3D.PERIOD_MATERIAL,
 
             "u_AmbientColor":Laya.Shader3D.PERIOD_SCENE,
             "u_DirationLightCount":Laya.Shader3D.PERIOD_SCENE,

@@ -208,16 +208,17 @@ export default class GameUI extends ui.test.TestSceneUI {
         scene.ambientColor = new Laya.Vector3(0.1, 0.1, 0.0);
         camera.transform.translate(new Laya.Vector3(0, 3, 3));
         camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-        var earth = this.gameScene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(1.5 , 64 , 64))) as Laya.MeshSprite3D;
-        earth.transform.position = new Laya.Vector3(0 , 0 , -3);
+        this.box = this.gameScene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(1.5 , 64 , 64))) as Laya.MeshSprite3D;
+        this.box.transform.position = new Laya.Vector3(0 , 0 , -3);
         LightingShader.initShader();
         var material:LightingMaterial = new LightingMaterial();
         Laya.Texture2D.load("res/layabox.png", Laya.Handler.create(null, function(tex:Laya.Texture2D) {
             material.albedoTexture = tex;
         }));
         // material.albedoColor = new Laya.Vector4(1,1,1,1);
-        
-        earth.meshRenderer.material = material;
+        this.slider_width.on(Laya.Event.CHANGED,this,this.onSliderShininessChange);
+
+        this.box.meshRenderer.material = material;
     }
 
     private onLoadComplete() {
@@ -232,8 +233,6 @@ export default class GameUI extends ui.test.TestSceneUI {
         material.secondTexture = Laya.loader.getRes("res/bg2.jpg");
 
         this.box.meshRenderer.material = material;
-
-
         
     }
 
@@ -262,4 +261,9 @@ export default class GameUI extends ui.test.TestSceneUI {
         material.mosaicSize = v;
     }
 
+    private onSliderShininessChange() {
+        let v = this.slider_width.value / 100;
+        let material: LightingMaterial = this.box.meshRenderer.sharedMaterial as LightingMaterial;
+        material.shininess = v;
+    }
 }

@@ -17,6 +17,8 @@ varying vec2 v_TexCoord0;
 
 varying vec3 v_Normal; 
 
+varying vec4 v_Position;
+
 void main() {
   mat3 _world2Object;
 
@@ -24,9 +26,11 @@ void main() {
 
 #ifdef GPU_INSTANCE
   gl_Position = a_MvpMatrix * a_Position;
+  v_Position = a_WorldMat * a_Position;
   _world2Object = INVERSE_MAT(mat3(a_WorldMat));
 #else
   gl_Position = u_MvpMatrix * a_Position;
+  v_Position = u_WorldMat * a_Position;
   _world2Object = INVERSE_MAT(mat3(u_WorldMat));
 #endif
 
