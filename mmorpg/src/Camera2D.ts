@@ -30,10 +30,12 @@ export default class Camera2D {
             this._targetPos.x = this._focusTarget.x - halfWidth;
             this._targetPos.y = this._focusTarget.y - halfHeight;
 
-            if (this._focusTarget.x + halfWidth < WorldMap.ins.grid.gridWidth && this._focusTarget.x - halfWidth > 0) {
+            if (this._focusTarget.x + halfWidth < WorldMap.ins.grid.gridWidth &&
+                this._focusTarget.x - halfWidth > 0) {
                 this._cameraView.x += (this._targetPos.x - this._cameraView.x) * Laya.timer.delta * this._ease;
             }
-            if (this._focusTarget.y + halfHeight < WorldMap.ins.grid.gridHeight && this._focusTarget.y - halfHeight > 0) {
+            if (this._focusTarget.y + halfHeight < WorldMap.ins.grid.gridHeight &&
+                this._focusTarget.y - halfHeight > 0) {
                 this._cameraView.y += (this._targetPos.y - this._cameraView.y) * Laya.timer.delta * this._ease;
             }
         }

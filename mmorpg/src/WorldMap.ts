@@ -48,7 +48,11 @@ export default class WorldMap {
     public getNeedLoadTile(x: number, y: number): { [key: string]: string } {
         let cellWidth = this.grid.cellWidth;
         let cellHeight = this.grid.cellHeight;
+        if (y < cellHeight){
+            debugger;
+        }
         let rect = new Laya.Rectangle(x - cellWidth, y - cellHeight, GameConfig.width + cellWidth, GameConfig.height + cellHeight);
+        
         let p1: Laya.Point = this.scenePosToGrid(rect.x, rect.y);
         let p2: Laya.Point = this.scenePosToGrid(rect.right, rect.bottom); // needload
         let loadMap: { [key: string]: string } = {};

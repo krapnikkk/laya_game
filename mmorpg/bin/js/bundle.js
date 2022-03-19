@@ -21,6 +21,14 @@ var polea = (() => {
       }
       this.displayObject = new Laya.Sprite();
       let child = Laya.Sprite.fromImage("./res/player.png");
+      Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite) => {
+        let scene = Laya.stage.addChild(new Laya.Scene3D());
+        Laya.Sprite3D.load("./res/3dScene/cike/Conventional/Main Camera.lh", Laya.Handler.create(this, (camera) => {
+          scene.addChild(camera);
+          sprite.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
+          scene.addChild(sprite);
+        }));
+      }));
       this.displayObject.addChild(child);
       child.x -= 48;
       child.y -= 48;
@@ -44,8 +52,8 @@ var polea = (() => {
       var reg = Laya.ClassUtils.regClass;
     }
   };
-  GameConfig.width = 1334;
-  GameConfig.height = 750;
+  GameConfig.width = 750;
+  GameConfig.height = 1334;
   GameConfig.scaleMode = "noscale";
   GameConfig.screenMode = "none";
   GameConfig.alignV = "top";
@@ -96,7 +104,6 @@ var polea = (() => {
       this._displayobject.graphics.drawTexture(texture, 0, 0);
       this._displayobject.x = this._col * 300;
       this._displayobject.y = this._row * 300;
-      console.log(this._row, this._col);
       this._parent.addChild(this._displayobject);
     }
     unLoadTile() {
@@ -153,6 +160,9 @@ var polea = (() => {
     getNeedLoadTile(x, y) {
       let cellWidth = this.grid.cellWidth;
       let cellHeight = this.grid.cellHeight;
+      if (y < cellHeight) {
+        debugger;
+      }
       let rect = new Laya.Rectangle(x - cellWidth, y - cellHeight, GameConfig.width + cellWidth, GameConfig.height + cellHeight);
       let p1 = this.scenePosToGrid(rect.x, rect.y);
       let p2 = this.scenePosToGrid(rect.right, rect.bottom);
@@ -307,6 +317,7 @@ var polea = (() => {
     }
     mouseHandler(e) {
       let pos = SceneManager.ins.getMousePos();
+      console.log(pos);
       Player.ins.moveTo(pos);
     }
   };
@@ -332,8 +343,10 @@ var polea = (() => {
   // src/Main.ts
   var Main = class {
     constructor() {
+      let config3D = new Config3D();
+      config3D.isAlpha = true;
       if (window["Laya3D"])
-        Laya3D.init(GameConfig.width, GameConfig.height);
+        Laya3D.init(GameConfig.width, GameConfig.height, config3D);
       else
         Laya.init(GameConfig.width, GameConfig.height, Laya["WebGL"]);
       Laya["Physics"] && Laya["Physics"].enable();

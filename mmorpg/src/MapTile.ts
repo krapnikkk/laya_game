@@ -31,7 +31,6 @@ export default class MapTile {
         this._displayobject.graphics.drawTexture(texture,0,0);
         this._displayobject.x = this._col * 300;
         this._displayobject.y = this._row * 300;
-        console.log(this._row,this._col);
         this._parent.addChild(this._displayobject);
     }
 

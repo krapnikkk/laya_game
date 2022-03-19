@@ -22,6 +22,7 @@ export default class InputManager {
 
     private mouseHandler(e:Laya.Event) {
         let pos: Laya.Point = SceneManager.ins.getMousePos();
+        console.log(pos);
         Player.ins.moveTo(pos);
     }
 }

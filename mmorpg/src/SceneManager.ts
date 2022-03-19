@@ -18,23 +18,31 @@ export default class SceneManager {
     }
 
     private _scene: Laya.Sprite;
+    private _scene3d: Laya.Scene3D;
     private _layerMap: Laya.Sprite;
     private _layerActor: Laya.Sprite;
     private _layerEffect: Laya.Sprite;
     private _layerDic: Map<LayerEnum, Laya.Sprite> = new Map();
-    private _camera2d:Camera2D;
+    private _camera2d: Camera2D;
+    private _camera3d: Laya.Camera;
+    private _container3d:Laya.Sprite3D = new Laya.Sprite3D();
 
     get camera2d():Camera2D{
         return this._camera2d;
     }
 
     public init(): void {
+        this.init2d();
+        this.init3d();
+    }
+
+    public init2d():void{
         this._layerMap = new Laya.Sprite();
         this._layerActor = new Laya.Sprite();
         this._layerEffect = new Laya.Sprite();
         this._scene = new Laya.Sprite();
         this._camera2d = new Camera2D(this._scene);
-        
+
         this._scene.addChild(this._layerMap);
         this._scene.addChild(this._layerActor);
         this._scene.addChild(this._layerEffect);
@@ -44,9 +52,19 @@ export default class SceneManager {
         this._layerDic.set(LayerEnum.EffectLayer, this._layerEffect);
 
         Laya.stage.addChild(this._scene);
-
     }
 
+    public init3d():void{
+        this._scene3d = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;
+        Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite: Laya.Sprite3D) => {
+            Laya.Sprite3D.load("./res/3dScene/cike/Conventional/Main Camera.lh",
+                Laya.Handler.create(this, (camera: Laya.Sprite3D) => {
+                    this._camera3d = this._scene3d.addChild(camera) as Laya.Camera;
+                    sprite.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
+                    this._scene3d.addChild(sprite);
+                }))
+        }))
+    }
 
     public addToLayer(sprite: Laya.Sprite, layer: LayerEnum, x: number = 0, y: number = 0) {
         let layerSprite = this._layerDic.get(layer);
