@@ -7,43 +7,6 @@ var polea = (() => {
     LayerEnum2[LayerEnum2["EffectLayer"] = 2] = "EffectLayer";
   })(LayerEnum || (LayerEnum = {}));
 
-  // src/Player.ts
-  var Player = class {
-    static get ins() {
-      if (this._ins == null) {
-        this._ins = new Player();
-      }
-      return this._ins;
-    }
-    constructor() {
-      if (Player._ins) {
-        throw "singleton class is not use new constructor!";
-      }
-      this.displayObject = new Laya.Sprite();
-      let child = Laya.Sprite.fromImage("./res/player.png");
-      Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite) => {
-        let scene = Laya.stage.addChild(new Laya.Scene3D());
-        Laya.Sprite3D.load("./res/3dScene/cike/Conventional/Main Camera.lh", Laya.Handler.create(this, (camera) => {
-          scene.addChild(camera);
-          sprite.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
-          scene.addChild(sprite);
-        }));
-      }));
-      this.displayObject.addChild(child);
-      child.x -= 48;
-      child.y -= 48;
-    }
-    moveTo(position) {
-      if (this._moveTween) {
-        this._moveTween.clear();
-      }
-      this._moveTween = Laya.Tween.to(this.displayObject, {
-        x: position.x,
-        y: position.y
-      }, 1e3);
-    }
-  };
-
   // src/GameConfig.ts
   var GameConfig = class {
     constructor() {
@@ -243,10 +206,16 @@ var polea = (() => {
     }
   };
 
+  // src/Utils.ts
+  var angleToRandin = (angle) => {
+    return angle * Math.PI / 180;
+  };
+
   // src/SceneManager.ts
   var SceneManager = class {
     constructor() {
       this._layerDic = new Map();
+      this._container3d = new Laya.Sprite3D();
       if (SceneManager._ins) {
         throw "singleton class is not use new constructor!";
       }
@@ -257,14 +226,34 @@ var polea = (() => {
       }
       return this._ins;
     }
+    get scene() {
+      return this._scene;
+    }
+    get scene3d() {
+      return this._scene3d;
+    }
+    get camera3d() {
+      return this._camera3d;
+    }
+    get container3d() {
+      return this._container3d;
+    }
     get camera2d() {
       return this._camera2d;
     }
     init() {
+      this.init2d();
+      this.init3d();
+    }
+    init2d() {
       this._layerMap = new Laya.Sprite();
+      this._layerMap.name = "layerMap";
       this._layerActor = new Laya.Sprite();
+      this._layerActor.name = "layerActor";
       this._layerEffect = new Laya.Sprite();
+      this._layerEffect.name = "layerEffect";
       this._scene = new Laya.Sprite();
+      this._scene.name = "scene";
       this._camera2d = new Camera2D(this._scene);
       this._scene.addChild(this._layerMap);
       this._scene.addChild(this._layerActor);
@@ -273,6 +262,25 @@ var polea = (() => {
       this._layerDic.set(LayerEnum.ActorLayer, this._layerActor);
       this._layerDic.set(LayerEnum.EffectLayer, this._layerEffect);
       Laya.stage.addChild(this._scene);
+    }
+    init3d() {
+      this._scene3d = Laya.stage.addChild(new Laya.Scene3D());
+      this._scene3d.addChild(this._container3d);
+      this._container3d.transform.rotationEuler = new Laya.Vector3(angleToRandin(30));
+      this._camera3d = new Laya.Camera(10, 0.1, 300);
+      this._scene3d.addChild(this._camera3d);
+      this._camera3d.transform.translate(new Laya.Vector3(0, 0, 150));
+      this._camera3d.orthographic = true;
+      this._camera3d.orthographicVerticalSize = 10;
+      this._camera3d.clearFlag = Laya.CameraClearFlags.SolidColor;
+      this._camera3d.clearColor = new Laya.Vector4(0, 0, 0, 0);
+      var renderTexture = new Laya.RenderTexture(GameConfig.width, GameConfig.height, Laya.RenderTextureFormat.R8G8B8A8, Laya.RenderTextureDepthFormat.DEPTHSTENCIL_NONE);
+      this._camera3d.renderTarget = renderTexture;
+      this._camera3d.orthographicVerticalSize = 10;
+      this._camera3d.aspectRatio = 0;
+      var scene3DImage = new Laya.Image();
+      scene3DImage.source = new Laya.Texture(renderTexture);
+      Laya.stage.addChild(scene3DImage);
     }
     addToLayer(sprite, layer, x = 0, y = 0) {
       let layerSprite = this._layerDic.get(layer);
@@ -296,6 +304,61 @@ var polea = (() => {
         this._camera2d.update();
       }
       WorldMap.ins.update();
+    }
+  };
+
+  // src/Player.ts
+  var Player = class {
+    get displayObject() {
+      return this._displayerObject;
+    }
+    static get ins() {
+      if (this._ins == null) {
+        this._ins = new Player();
+      }
+      return this._ins;
+    }
+    constructor() {
+      if (Player._ins) {
+        throw "singleton class is not use new constructor!";
+      }
+      this._displayerObject = new Laya.Sprite();
+      let child = Laya.Sprite.fromImage("./res/player.png");
+      this.displayObject.addChild(child);
+      child.x -= 48;
+      child.y -= 48;
+      this.create3dObject();
+    }
+    moveTo(position) {
+      if (this._moveTween) {
+        this._moveTween.clear();
+      }
+      this._moveTween = Laya.Tween.to(this._displayerObject, {
+        x: position.x,
+        y: position.y
+      }, 1e3);
+    }
+    create3dObject() {
+      Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite) => {
+        this._displayerObject3d = SceneManager.ins.container3d.addChild(sprite);
+        this._displayerObject3d.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
+        this._displayerObject3d.transform.localScale = new Laya.Vector3(0.05, 0.05, 0.05);
+      }));
+    }
+    update() {
+      if (this._displayerObject3d) {
+        let pos = this.getGlobalVec3();
+        let transform = new Laya.Vector3();
+        SceneManager.ins.camera3d.convertScreenCoordToOrthographicCoord(pos, transform);
+        this._displayerObject3d.transform.position = transform;
+      }
+    }
+    getGlobalVec3() {
+      let pos = new Laya.Vector3();
+      let point = SceneManager.ins.scene.localToGlobal(new Laya.Point(this._displayerObject.x, this._displayerObject.y));
+      pos.x = point.x;
+      pos.y = point.y;
+      return pos;
     }
   };
 
@@ -337,6 +400,7 @@ var polea = (() => {
     }
     update() {
       SceneManager.ins.update();
+      Player.ins.update();
     }
   };
 
@@ -346,7 +410,7 @@ var polea = (() => {
       let config3D = new Config3D();
       config3D.isAlpha = true;
       if (window["Laya3D"])
-        Laya3D.init(GameConfig.width, GameConfig.height, config3D);
+        Laya3D.init(GameConfig.width, GameConfig.height);
       else
         Laya.init(GameConfig.width, GameConfig.height, Laya["WebGL"]);
       Laya["Physics"] && Laya["Physics"].enable();
@@ -355,6 +419,7 @@ var polea = (() => {
       Laya.stage.screenMode = GameConfig.screenMode;
       Laya.stage.alignV = GameConfig.alignV;
       Laya.stage.alignH = GameConfig.alignH;
+      Laya.stage.bgColor = null;
       Laya.URL.exportSceneToJson = GameConfig.exportSceneToJson;
       if (GameConfig.debug || Laya.Utils.getQueryString("debug") == "true")
         Laya.enableDebugPanel();

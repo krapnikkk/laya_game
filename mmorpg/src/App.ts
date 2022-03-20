@@ -23,5 +23,6 @@ export default class App{
 
     update(){
         SceneManager.ins.update();
+        Player.ins.update();
     }
 }

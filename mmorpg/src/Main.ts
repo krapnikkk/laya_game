@@ -5,7 +5,7 @@ class Main {
 		let config3D = new Config3D();
 		config3D.isAlpha = true;
 		//根据IDE设置初始化引擎		
-		if (window["Laya3D"]) Laya3D.init(GameConfig.width, GameConfig.height, config3D);
+		if (window["Laya3D"]) Laya3D.init(GameConfig.width, GameConfig.height);
 		else Laya.init(GameConfig.width, GameConfig.height, Laya["WebGL"]);
 
 		Laya["Physics"] && Laya["Physics"].enable();
@@ -14,6 +14,7 @@ class Main {
 		Laya.stage.screenMode = GameConfig.screenMode;
 		Laya.stage.alignV = GameConfig.alignV;
 		Laya.stage.alignH = GameConfig.alignH;
+		Laya.stage.bgColor = null;
 		//兼容微信不支持加载scene后缀场景
 		Laya.URL.exportSceneToJson = GameConfig.exportSceneToJson;
 

@@ -24,13 +24,13 @@
 				1,
 				1
 			],
-			"clearFlag":3,
+			"clearFlag":1,
 			"orthographic":true,
-			"orthographicVerticalSize":20,
+			"orthographicVerticalSize":10,
 			"fieldOfView":60,
-			"enableHDR":true,
+			"enableHDR":false,
 			"nearPlane":0.1,
-			"farPlane":100,
+			"farPlane":300,
 			"viewport":[
 				0,
 				0,
@@ -38,9 +38,9 @@
 				1
 			],
 			"clearColor":[
-				0.1921569,
-				0.3019608,
-				0.4745098,
+				0,
+				0,
+				0,
 				0
 			]
 		},
