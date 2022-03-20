@@ -1,8 +1,8 @@
-import GameConfig from "./GameConfig";
-import SceneManager from "./SceneManager";
-import { screenCoordTo3DCoord } from "./Utils";
+import SceneManager from "../SceneManager";
+import { ActorCamp, ActorType } from "./ActorType";
+import BaseActor from "./BaseActor";
 
-export default class Player {
+export default class Player extends BaseActor{
     private _displayerObject: Laya.Sprite;
     public get displayObject(): Laya.Sprite {
         return this._displayerObject;
@@ -10,12 +10,13 @@ export default class Player {
     private static _ins: Player;
     public static get ins(): Player {
         if (this._ins == null) {
-            this._ins = new Player();
+            this._ins = new Player(ActorType.PLAYER,ActorCamp.PLAYER);
         }
         return this._ins;
     }
 
-    private constructor() {
+    private constructor(type:ActorType,camp:ActorCamp) {
+        super(type,camp);
         if (Player._ins) {
             throw "singleton class is not use new constructor!";
         }

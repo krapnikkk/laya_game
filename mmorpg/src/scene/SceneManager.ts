@@ -1,7 +1,7 @@
 import Camera2D from "./Camera2D";
-import { LayerEnum } from "./Enum";
-import GameConfig from "./GameConfig";
-import { angleToRandin } from "./Utils";
+import { LayerEnum } from "../Enum";
+import GameConfig from "../GameConfig";
+import { angleToRandin } from "../Utils";
 import WorldMap from "./WorldMap";
 
 export default class SceneManager {

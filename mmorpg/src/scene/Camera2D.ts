@@ -1,4 +1,4 @@
-import GameConfig from "./GameConfig";
+import GameConfig from "../GameConfig";
 import WorldMap from "./WorldMap";
 
 export default class Camera2D {

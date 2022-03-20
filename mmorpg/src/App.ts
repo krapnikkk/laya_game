@@ -1,6 +1,6 @@
 import { LayerEnum } from "./Enum";
 import InputManager from "./InputManager";
-import Player from "./Player";
+import Player from "./actor/Player";
 import SceneManager from "./SceneManager";
 import WorldMap from "./WorldMap";
 

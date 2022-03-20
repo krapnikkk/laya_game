@@ -1,5 +1,5 @@
-import Player from "./Player";
-import SceneManager from "./SceneManager";
+import Player from "./actor/Player";
+import SceneManager from "./scene/SceneManager";
 
 export default class InputManager {
     private static _ins: InputManager;
