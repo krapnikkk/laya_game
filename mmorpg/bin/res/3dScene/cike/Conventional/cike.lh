@@ -25,7 +25,42 @@
 				0.5
 			]
 		},
-		"components":[],
+		"components":[
+			{
+				"type":"Animator",
+				"layers":[
+					{
+						"name":"Base Layer",
+						"weight":0,
+						"blendingMode":0,
+						"states":[
+							{
+								"name":"daiji",
+								"speed":1,
+								"clipPath":"Assets/Model/cike-daiji.lani"
+							},
+							{
+								"name":"jineng",
+								"speed":1,
+								"clipPath":"Assets/Model/cike-jineng.lani"
+							},
+							{
+								"name":"paobu",
+								"speed":1,
+								"clipPath":"Assets/Model/cike-paobu.lani"
+							},
+							{
+								"name":"tiaoyue",
+								"speed":1,
+								"clipPath":"Assets/Model/cike-tiaoyue.lani"
+							}
+						]
+					}
+				],
+				"cullingMode":0,
+				"playOnWake":true
+			}
+		],
 		"child":[
 			{
 				"type":"Sprite3D",

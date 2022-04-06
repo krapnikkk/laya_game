@@ -1,4 +1,4 @@
-import GameConfig from "./GameConfig";
+import GameConfig from "../GameConfig";
 import MapGrid from "./MapGrid";
 import MapTile from "./MapTile";
 import SceneManager from "./SceneManager";

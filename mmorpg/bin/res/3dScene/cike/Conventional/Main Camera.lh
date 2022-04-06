@@ -26,11 +26,11 @@
 			],
 			"clearFlag":1,
 			"orthographic":true,
-			"orthographicVerticalSize":10,
+			"orthographicVerticalSize":20,
 			"fieldOfView":60,
 			"enableHDR":false,
 			"nearPlane":0.1,
-			"farPlane":300,
+			"farPlane":100,
 			"viewport":[
 				0,
 				0,

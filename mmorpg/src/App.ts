@@ -1,8 +1,8 @@
 import { LayerEnum } from "./Enum";
 import InputManager from "./InputManager";
 import Player from "./actor/Player";
-import SceneManager from "./SceneManager";
-import WorldMap from "./WorldMap";
+import SceneManager from "./scene/SceneManager";
+import WorldMap from "./scene/WorldMap";
 
 export default class App{
     constructor(){
@@ -12,9 +12,9 @@ export default class App{
     init(){
         SceneManager.ins.init();
         SceneManager.ins.addToLayer(WorldMap.ins.container, LayerEnum.MapLayer);
-        SceneManager.ins.addToLayer(Player.ins.displayObject, LayerEnum.ActorLayer,1024,1024);
+        SceneManager.ins.addToLayer(Player.ins.displayObjectController.displayObject, LayerEnum.ActorLayer,1024,1024);
 
-        SceneManager.ins.camera2d.focus(Player.ins.displayObject);
+        SceneManager.ins.camera2d.focus(Player.ins.displayObjectController.displayObject);
         InputManager.ins.init();
 
         Laya.timer.frameLoop(1,this,this.update);

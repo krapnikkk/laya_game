@@ -11,17 +11,10 @@ export default class ActorBase {
     public get camp(): ActorCamp {
         return this._camp;
     }
-
-    protected _propertyManager:ActorPropertyManager;
-    public get propertyManager(){
-        return this._propertyManager;
-    }
-
     constructor(type: ActorType, camp: ActorCamp) {
         this._type = type;
         this._camp = camp;
-        this._propertyManager = new ActorPropertyManager(this);
-    }
+        }
 
     public isActorType(type: ActorType): boolean {
         return this._type == type;

@@ -1,13 +1,13 @@
-import ActorBase from "../actor/BaseActor";
+import Actor from "../actor/Actor";
 import ActorProperty from "./ActorProperty";
 import { ActorPropertyType } from "./ActorPropertyType";
 
 export default class ActorPropertyManager {
-    private _owner: ActorBase;
+    private _owner: Actor;
     protected _baseProperty: ActorProperty;
     protected _deltaProperty: ActorProperty;
 
-    public constructor(owner: ActorBase) {
+    public constructor(owner: Actor) {
         this._owner = owner;
         this._baseProperty = new ActorProperty();
         this._deltaProperty = new ActorProperty();

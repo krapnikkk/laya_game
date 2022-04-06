@@ -7,6 +7,210 @@ var polea = (() => {
     LayerEnum2[LayerEnum2["EffectLayer"] = 2] = "EffectLayer";
   })(LayerEnum || (LayerEnum = {}));
 
+  // src/actor/ActorType.ts
+  var ActorType;
+  (function(ActorType2) {
+    ActorType2[ActorType2["PLAYER"] = 0] = "PLAYER";
+    ActorType2[ActorType2["MONSTER"] = 1] = "MONSTER";
+    ActorType2[ActorType2["NPC"] = 2] = "NPC";
+  })(ActorType || (ActorType = {}));
+  var ActorCamp;
+  (function(ActorCamp2) {
+    ActorCamp2[ActorCamp2["PLAYER"] = 0] = "PLAYER";
+    ActorCamp2[ActorCamp2["ENEMY"] = 1] = "ENEMY";
+    ActorCamp2[ActorCamp2["NEUTRAL"] = 2] = "NEUTRAL";
+  })(ActorCamp || (ActorCamp = {}));
+
+  // src/property/ActorProperty.ts
+  var ActorProperty = class {
+    constructor() {
+      this._propertiesMap = new Map();
+    }
+    getProperty(type) {
+      if (this._propertiesMap.has(type)) {
+        return this._propertiesMap.get(type);
+      } else {
+        return -1;
+      }
+    }
+    changeProperty(type, value) {
+      let old = this.getProperty(type);
+      value += old;
+      this.setProperty(type, value);
+    }
+    setProperty(type, value) {
+      this._propertiesMap.set(type, value);
+    }
+    clear() {
+      this._propertiesMap.clear();
+    }
+  };
+
+  // src/property/ActorPropertyType.ts
+  var ActorPropertyType;
+  (function(ActorPropertyType2) {
+    ActorPropertyType2[ActorPropertyType2["HP"] = 0] = "HP";
+    ActorPropertyType2[ActorPropertyType2["Speed"] = 1] = "Speed";
+    ActorPropertyType2[ActorPropertyType2["FlySpeed"] = 2] = "FlySpeed";
+    ActorPropertyType2[ActorPropertyType2["Atk"] = 3] = "Atk";
+  })(ActorPropertyType || (ActorPropertyType = {}));
+
+  // src/property/ActorPropertyManager.ts
+  var ActorPropertyManager = class {
+    constructor(owner) {
+      this._owner = owner;
+      this._baseProperty = new ActorProperty();
+      this._deltaProperty = new ActorProperty();
+      this.clear();
+    }
+    getBaseProperty(type) {
+      return this._baseProperty[type];
+    }
+    setBaseProperty(type, value) {
+      this._baseProperty.setProperty(type, value);
+    }
+    getProperty(type) {
+      let max = this._baseProperty.getProperty(type);
+      let delta = this._deltaProperty.getProperty(type);
+      return max + delta;
+    }
+    changeProperty(type, value) {
+      let max = this.getProperty(type) + value;
+      if (max > this.getBaseProperty(type)) {
+        this._deltaProperty.setProperty(type, 0);
+      } else if (max <= 0) {
+        this._deltaProperty.setProperty(type, -this.getBaseProperty(type));
+      } else {
+        this._deltaProperty.setProperty(type, value);
+      }
+    }
+    clear() {
+      for (let i = 0; i < Object.keys(ActorPropertyType).length; i++) {
+        this._baseProperty.setProperty(i, 0);
+        this._deltaProperty.setProperty(i, 0);
+      }
+    }
+  };
+
+  // src/actor/ActorBase.ts
+  var ActorBase = class {
+    get type() {
+      return this._type;
+    }
+    get camp() {
+      return this._camp;
+    }
+    constructor(type, camp) {
+      this._type = type;
+      this._camp = camp;
+    }
+    isActorType(type) {
+      return this._type == type;
+    }
+    isActorCamp(camp) {
+      return this._camp == camp;
+    }
+  };
+
+  // src/core/StateMachine.ts
+  var _StateMachine = class {
+    constructor(owner) {
+      this._stateDic = new Map();
+      this.owner = owner;
+    }
+    get owner() {
+      return this._owner;
+    }
+    set owner(val) {
+      this._owner = val;
+    }
+    registerState(stateKey, state) {
+      if (this._owner != state.owner) {
+        return;
+      }
+      this._stateDic.set(stateKey, state);
+    }
+    isExit(stateKey) {
+      return this._stateDic.has(stateKey);
+    }
+    changeState(key, obj) {
+      let newState = this._stateDic.get(key);
+      if (newState) {
+        this._currentState.onLeave(newState.getStateKey());
+      }
+      this._currentState = newState;
+      this._currentState.onEnter(obj);
+    }
+    update() {
+      if (this._currentState != null) {
+        this._currentState.onUpdate();
+      }
+    }
+    getCurrentState() {
+      if (this._currentState) {
+        return this._currentState.getStateKey();
+      }
+      return _StateMachine.InvalidState;
+    }
+    clear() {
+      if (this._currentState) {
+        this._currentState.onLeave(_StateMachine.InvalidState);
+      }
+      this._stateDic.clear();
+      this._currentState = null;
+    }
+  };
+  var StateMachine = _StateMachine;
+  StateMachine.InvalidState = "InvalidState";
+
+  // src/actor/animation/AnimationController.ts
+  var AnimationController = class {
+    constructor(animator) {
+      this._keyframe = -1;
+      this._animator = animator;
+    }
+    playAni(name, start, endFrame, keyframe, isLoop = false, keyframeHandler = null, completeHandler = null) {
+      if (this._animator) {
+        this._completeHandler = completeHandler;
+        this._keyframeHandler = keyframeHandler;
+        this._keyframe = keyframe;
+        let state = new Laya.AnimatorState();
+        state.name = "hello";
+        state.clipStart = 10 / 40;
+        state.clipEnd = 20 / 40;
+        state.clip = this._animator.getDefaultState().clip;
+        state.clip.islooping = true;
+        this._animator.addState(state);
+        this._animator.play(name);
+        Laya.timer.frameLoop(1, this, function() {
+          if (this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime >= 1) {
+          }
+        });
+      }
+    }
+    onAniFinish() {
+      if (this._completeHandler) {
+        this._completeHandler.run();
+        this._completeHandler.recover();
+        this._completeHandler = null;
+      }
+    }
+    stop() {
+      this._keyframeHandler = null;
+      this._completeHandler = null;
+      this._keyframe = -1;
+    }
+    update() {
+      if (this._isPlaying) {
+        if (this._keyframe > 0 && this._keyframeHandler) {
+          this._keyframeHandler.run();
+          this._keyframeHandler.recover();
+          this._keyframeHandler = null;
+        }
+      }
+    }
+  };
+
   // src/GameConfig.ts
   var GameConfig = class {
     constructor() {
@@ -29,7 +233,7 @@ var polea = (() => {
   GameConfig.exportSceneToJson = true;
   GameConfig.init();
 
-  // src/MapGrid.ts
+  // src/scene/MapGrid.ts
   var MapGrid = class {
     constructor() {
       this.gridWidth = 6e3;
@@ -41,7 +245,7 @@ var polea = (() => {
     }
   };
 
-  // src/MapTile.ts
+  // src/scene/MapTile.ts
   var MapTile = class {
     constructor(row, col, parent) {
       this._isLoaded = false;
@@ -82,7 +286,7 @@ var polea = (() => {
     }
   };
 
-  // src/WorldMap.ts
+  // src/scene/WorldMap.ts
   var WorldMap = class {
     constructor() {
       this._container = new Laya.Sprite();
@@ -174,7 +378,7 @@ var polea = (() => {
     }
   };
 
-  // src/Camera2D.ts
+  // src/scene/Camera2D.ts
   var Camera2D = class {
     constructor(scene) {
       this._targetPos = new Laya.Point();
@@ -211,7 +415,7 @@ var polea = (() => {
     return angle * Math.PI / 180;
   };
 
-  // src/SceneManager.ts
+  // src/scene/SceneManager.ts
   var SceneManager = class {
     constructor() {
       this._layerDic = new Map();
@@ -307,45 +511,37 @@ var polea = (() => {
     }
   };
 
-  // src/Player.ts
-  var Player = class {
+  // src/actor/DisplayObjectController.ts
+  var DisplayObjectController = class {
     get displayObject() {
       return this._displayerObject;
     }
-    static get ins() {
-      if (this._ins == null) {
-        this._ins = new Player();
-      }
-      return this._ins;
+    constructor(owner) {
+      this._owner = owner;
+      this.create2dObj();
+      this.create3dObj();
     }
-    constructor() {
-      if (Player._ins) {
-        throw "singleton class is not use new constructor!";
-      }
+    create2dObj() {
       this._displayerObject = new Laya.Sprite();
       let child = Laya.Sprite.fromImage("./res/player.png");
       this.displayObject.addChild(child);
       child.x -= 48;
       child.y -= 48;
-      this.create3dObject();
     }
-    moveTo(position) {
-      if (this._moveTween) {
-        this._moveTween.clear();
-      }
-      this._moveTween = Laya.Tween.to(this._displayerObject, {
-        x: position.x,
-        y: position.y
-      }, 1e3);
-    }
-    create3dObject() {
+    create3dObj() {
       Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite) => {
         this._displayerObject3d = SceneManager.ins.container3d.addChild(sprite);
         this._displayerObject3d.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
         this._displayerObject3d.transform.localScale = new Laya.Vector3(0.05, 0.05, 0.05);
+        let animator = sprite.getComponent(Laya.Animator);
+        this._animationController = new AnimationController(animator);
+        animator.play("daiji");
       }));
     }
     update() {
+      if (this._animationController) {
+        this._animationController.update();
+      }
       if (this._displayerObject3d) {
         let pos = this.getGlobalVec3();
         let transform = new Laya.Vector3();
@@ -359,6 +555,60 @@ var polea = (() => {
       pos.x = point.x;
       pos.y = point.y;
       return pos;
+    }
+    moveTo(position) {
+      if (this._moveTween) {
+        this._moveTween.clear();
+      }
+      this._moveTween = Laya.Tween.to(this._displayerObject, {
+        x: position.x,
+        y: position.y
+      }, 1e3);
+    }
+  };
+
+  // src/actor/Actor.ts
+  var Actor = class extends ActorBase {
+    get displayObjectController() {
+      return this._displayObjectController;
+    }
+    get stateMachine() {
+      return this._stateMachine;
+    }
+    get propertyManager() {
+      return this._propertyManager;
+    }
+    constructor(type, camp) {
+      super(type, camp);
+      this._stateMachine = new StateMachine(this);
+      this._propertyManager = new ActorPropertyManager(this);
+      this._displayObjectController = new DisplayObjectController(this);
+    }
+    moveTo(position) {
+      if (this._displayObjectController) {
+        this._displayObjectController.moveTo(position);
+      }
+    }
+    update() {
+      if (this._displayObjectController) {
+        this._displayObjectController.update();
+      }
+    }
+  };
+
+  // src/actor/Player.ts
+  var Player = class extends Actor {
+    static get ins() {
+      if (this._ins == null) {
+        this._ins = new Player(ActorType.PLAYER, ActorCamp.PLAYER);
+      }
+      return this._ins;
+    }
+    constructor(type, camp) {
+      super(type, camp);
+      if (Player._ins) {
+        throw "singleton class is not use new constructor!";
+      }
     }
   };
 
@@ -393,8 +643,8 @@ var polea = (() => {
     init() {
       SceneManager.ins.init();
       SceneManager.ins.addToLayer(WorldMap.ins.container, LayerEnum.MapLayer);
-      SceneManager.ins.addToLayer(Player.ins.displayObject, LayerEnum.ActorLayer, 1024, 1024);
-      SceneManager.ins.camera2d.focus(Player.ins.displayObject);
+      SceneManager.ins.addToLayer(Player.ins.displayObjectController.displayObject, LayerEnum.ActorLayer, 1024, 1024);
+      SceneManager.ins.camera2d.focus(Player.ins.displayObjectController.displayObject);
       InputManager.ins.init();
       Laya.timer.frameLoop(1, this, this.update);
     }

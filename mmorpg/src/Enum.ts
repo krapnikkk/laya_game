@@ -3,3 +3,12 @@ export enum LayerEnum {
     ActorLayer,
     EffectLayer
 }
+
+export enum ActorState{
+    IDLE = "idle",
+    Move = "move",
+    FLY = "fly",
+    SKILL = "skill",
+    Dead = "dead",
+
+}
