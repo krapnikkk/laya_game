@@ -1,4 +1,4 @@
-import { LayerEnum } from "./Enum";
+import { ActorState, LayerEnum } from "./Enum";
 import InputManager from "./InputManager";
 import Player from "./actor/Player";
 import SceneManager from "./scene/SceneManager";
@@ -16,6 +16,8 @@ export default class App{
 
         SceneManager.ins.camera2d.focus(Player.ins.displayObjectController.displayObject);
         InputManager.ins.init();
+
+        Player.ins.changeState(ActorState.IDLE);
 
         Laya.timer.frameLoop(1,this,this.update);
 

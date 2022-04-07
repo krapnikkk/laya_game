@@ -3,6 +3,7 @@ import ActorBase from "./ActorBase";
 import StateMachine from "../core/StateMachine";
 import { ActorType, ActorCamp } from "./ActorType";
 import DisplayObjectController from "./DisplayObjectController";
+import State from "../core/State";
 
 export default class Actor extends ActorBase {
     protected _displayObjectController: DisplayObjectController;
@@ -29,6 +30,12 @@ export default class Actor extends ActorBase {
 
     registerStates():void{
         this._stateMachine = new StateMachine(this);
+    }
+
+    changeState(stateKey:string,obj:Object=null):void{
+        if (this._stateMachine) {
+            this._stateMachine.changeState(stateKey, obj)
+        }
     }
 
     moveTo(position: Laya.Point) {

@@ -43,7 +43,7 @@ export default class DisplayObjectController {
             // let mesh = sprite.getChildByName("mod_CiKeZhuangBei_Body_03") as Laya.MeshSprite3D;
             let animator = sprite.getComponent(Laya.Animator) as Laya.Animator;
             this._animationController = new AnimationController(animator);
-            animator.play("daiji");
+            // animator.play("daiji");
         }))
 
     }

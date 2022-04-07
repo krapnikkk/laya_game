@@ -1,5 +1,10 @@
 import { ActorCamp, ActorType } from "./ActorType";
 import Actor from "./Actor";
+import State from "../core/State";
+import { ActorState } from "../Enum";
+import ActorIdleState from "./state/ActorIdleState";
+import ActorMoveState from "./state/ActorMoveState";
+import ActorSkillState from "./state/ActorSkillState";
 
 export default class Player extends Actor {
 
@@ -20,6 +25,8 @@ export default class Player extends Actor {
 
     registerStates(){
         super.registerStates();
-        // this.stateMachine.registerState()
+        this.stateMachine.registerState(ActorState.IDLE, new ActorIdleState(this))
+        this.stateMachine.registerState(ActorState.Move, new ActorMoveState(this))
+        this.stateMachine.registerState(ActorState.SKILL, new ActorSkillState(this))
     }
 }

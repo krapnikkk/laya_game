@@ -30,7 +30,10 @@ export default class StateMachine {
 
     changeState(key:string,obj:Object):void{
         let newState = this._stateDic.get(key);
-        if(newState){
+        if (!newState){
+            return;
+        }
+        if (this._currentState){
             this._currentState.onLeave(newState.getStateKey());
         }
         this._currentState = newState;

@@ -1,5 +1,5 @@
-import State from "../core/State";
-import Actor from "./Actor";
+import State from "../../core/State";
+import Actor from "../Actor";
 
 export default class ActorStateBase extends State{
     protected _actor: Actor
@@ -15,7 +15,7 @@ export default class ActorStateBase extends State{
     }
 
     onLeave(newState: string): void {
-
+        
     }
 
     getStateKey(): string {
@@ -23,6 +23,6 @@ export default class ActorStateBase extends State{
     }
 
     onUpdate(): void {
-
+        
     }
 }

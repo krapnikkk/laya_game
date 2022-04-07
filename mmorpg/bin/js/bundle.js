@@ -6,6 +6,14 @@ var polea = (() => {
     LayerEnum2[LayerEnum2["ActorLayer"] = 1] = "ActorLayer";
     LayerEnum2[LayerEnum2["EffectLayer"] = 2] = "EffectLayer";
   })(LayerEnum || (LayerEnum = {}));
+  var ActorState;
+  (function(ActorState2) {
+    ActorState2["IDLE"] = "idle";
+    ActorState2["Move"] = "move";
+    ActorState2["FLY"] = "fly";
+    ActorState2["SKILL"] = "skill";
+    ActorState2["Dead"] = "dead";
+  })(ActorState || (ActorState = {}));
 
   // src/actor/ActorType.ts
   var ActorType;
@@ -135,7 +143,10 @@ var polea = (() => {
     }
     changeState(key, obj) {
       let newState = this._stateDic.get(key);
-      if (newState) {
+      if (!newState) {
+        return;
+      }
+      if (this._currentState) {
         this._currentState.onLeave(newState.getStateKey());
       }
       this._currentState = newState;
@@ -169,21 +180,13 @@ var polea = (() => {
       this._keyframe = -1;
       this._animator = animator;
     }
-    playAni(name, start, endFrame, keyframe, isLoop = false, keyframeHandler = null, completeHandler = null) {
+    playAni(name, isLoop = false, completeHandler = null) {
       if (this._animator) {
         this._completeHandler = completeHandler;
-        this._keyframeHandler = keyframeHandler;
-        this._keyframe = keyframe;
-        let state = new Laya.AnimatorState();
-        state.name = "hello";
-        state.clipStart = 10 / 40;
-        state.clipEnd = 20 / 40;
-        state.clip = this._animator.getDefaultState().clip;
-        state.clip.islooping = true;
-        this._animator.addState(state);
         this._animator.play(name);
-        Laya.timer.frameLoop(1, this, function() {
+        Laya.timer.frameLoop(1, this, () => {
           if (this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime >= 1) {
+            this.onAniFinish();
           }
         });
       }
@@ -191,7 +194,6 @@ var polea = (() => {
     onAniFinish() {
       if (this._completeHandler) {
         this._completeHandler.run();
-        this._completeHandler.recover();
         this._completeHandler = null;
       }
     }
@@ -204,7 +206,6 @@ var polea = (() => {
       if (this._isPlaying) {
         if (this._keyframe > 0 && this._keyframeHandler) {
           this._keyframeHandler.run();
-          this._keyframeHandler.recover();
           this._keyframeHandler = null;
         }
       }
@@ -513,13 +514,20 @@ var polea = (() => {
 
   // src/actor/DisplayObjectController.ts
   var DisplayObjectController = class {
-    get displayObject() {
-      return this._displayerObject;
-    }
     constructor(owner) {
+      this._is3dObjLoaded = false;
       this._owner = owner;
       this.create2dObj();
       this.create3dObj();
+    }
+    get displayObject() {
+      return this._displayerObject;
+    }
+    get animationController() {
+      return this._animationController;
+    }
+    get is3dObjLoaded() {
+      return this._is3dObjLoaded;
     }
     create2dObj() {
       this._displayerObject = new Laya.Sprite();
@@ -530,12 +538,12 @@ var polea = (() => {
     }
     create3dObj() {
       Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite) => {
+        this._is3dObjLoaded = true;
         this._displayerObject3d = SceneManager.ins.container3d.addChild(sprite);
         this._displayerObject3d.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
         this._displayerObject3d.transform.localScale = new Laya.Vector3(0.05, 0.05, 0.05);
         let animator = sprite.getComponent(Laya.Animator);
         this._animationController = new AnimationController(animator);
-        animator.play("daiji");
       }));
     }
     update() {
@@ -580,9 +588,17 @@ var polea = (() => {
     }
     constructor(type, camp) {
       super(type, camp);
-      this._stateMachine = new StateMachine(this);
+      this.registerStates();
       this._propertyManager = new ActorPropertyManager(this);
       this._displayObjectController = new DisplayObjectController(this);
+    }
+    registerStates() {
+      this._stateMachine = new StateMachine(this);
+    }
+    changeState(stateKey, obj = null) {
+      if (this._stateMachine) {
+        this._stateMachine.changeState(stateKey, obj);
+      }
     }
     moveTo(position) {
       if (this._displayObjectController) {
@@ -593,6 +609,88 @@ var polea = (() => {
       if (this._displayObjectController) {
         this._displayObjectController.update();
       }
+    }
+  };
+
+  // src/core/State.ts
+  var State = class {
+    get owner() {
+      return this._owner;
+    }
+    constructor(owner) {
+      this._owner = owner;
+    }
+    onEnter(obj) {
+    }
+    onLeave(newState) {
+    }
+    getStateKey() {
+      return "";
+    }
+    onUpdate() {
+    }
+  };
+
+  // src/actor/state/ActorStateBase.ts
+  var ActorStateBase = class extends State {
+    constructor(owner) {
+      super(owner);
+      this._actor = owner;
+    }
+    onEnter(obj) {
+      if (this._actor && this._actor.displayObjectController.is3dObjLoaded) {
+      }
+    }
+    onLeave(newState) {
+    }
+    getStateKey() {
+      return "";
+    }
+    onUpdate() {
+    }
+  };
+
+  // src/actor/state/ActorIdleState.ts
+  var ActorIdleState = class extends ActorStateBase {
+    constructor(owner) {
+      super(owner);
+    }
+    onEnter(obj = null) {
+      super.onEnter(obj);
+      if (this._actor && this._actor.displayObjectController.is3dObjLoaded) {
+        this._actor.displayObjectController.animationController.playAni("daiji");
+      }
+    }
+  };
+
+  // src/actor/state/ActorMoveState.ts
+  var ActorMoveState = class extends ActorStateBase {
+    constructor(owner) {
+      super(owner);
+    }
+    onEnter(obj = null) {
+      super.onEnter(obj);
+      if (this._actor && this._actor.displayObjectController.is3dObjLoaded) {
+        this._actor.displayObjectController.animationController.playAni("paobu");
+      }
+    }
+  };
+
+  // src/actor/state/ActorSkillState.ts
+  var ActorSkillState = class extends ActorStateBase {
+    constructor(owner) {
+      super(owner);
+    }
+    onEnter(obj = null) {
+      super.onEnter(obj);
+      if (this._actor && this._actor.displayObjectController.is3dObjLoaded) {
+        this._actor.displayObjectController.animationController.playAni("jineng", false, Laya.Handler.create(this, this.onAniFinish));
+      }
+    }
+    keyFrameHandler() {
+    }
+    onAniFinish() {
+      this._actor.changeState(ActorState.IDLE);
     }
   };
 
@@ -609,6 +707,12 @@ var polea = (() => {
       if (Player._ins) {
         throw "singleton class is not use new constructor!";
       }
+    }
+    registerStates() {
+      super.registerStates();
+      this.stateMachine.registerState(ActorState.IDLE, new ActorIdleState(this));
+      this.stateMachine.registerState(ActorState.Move, new ActorMoveState(this));
+      this.stateMachine.registerState(ActorState.SKILL, new ActorSkillState(this));
     }
   };
 
@@ -627,11 +731,18 @@ var polea = (() => {
     }
     init() {
       Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.mouseHandler);
+      Laya.stage.on(Laya.Event.KEY_DOWN, this, this.onKeyDown);
     }
     mouseHandler(e) {
       let pos = SceneManager.ins.getMousePos();
-      console.log(pos);
       Player.ins.moveTo(pos);
+    }
+    onKeyDown(e) {
+      if (e.keyCode == 81) {
+        Player.ins.changeState(ActorState.Move);
+      } else if (e.keyCode == 87) {
+        Player.ins.changeState(ActorState.SKILL);
+      }
     }
   };
 
@@ -646,6 +757,7 @@ var polea = (() => {
       SceneManager.ins.addToLayer(Player.ins.displayObjectController.displayObject, LayerEnum.ActorLayer, 1024, 1024);
       SceneManager.ins.camera2d.focus(Player.ins.displayObjectController.displayObject);
       InputManager.ins.init();
+      Player.ins.changeState(ActorState.IDLE);
       Laya.timer.frameLoop(1, this, this.update);
     }
     update() {
