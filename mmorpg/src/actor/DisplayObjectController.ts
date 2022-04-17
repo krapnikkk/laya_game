@@ -26,7 +26,8 @@ export default class DisplayObjectController {
 
     create2dObj():void{
         this._displayerObject = new Laya.Sprite();
-        let child = Laya.Sprite.fromImage("./res/player.png");
+        // let child = Laya.Sprite.fromImage("./res/player.png");
+        let child = Laya.Sprite.fromImage(this._owner.templateData.file2d);
         this.displayObject.addChild(child);
         child.x -= 48;
         child.y -= 48;
@@ -35,7 +36,7 @@ export default class DisplayObjectController {
     }
 
     create3dObj(): void {
-        Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite: Laya.Sprite3D) => {
+        Laya.Sprite3D.load(this._owner.templateData.file3d, Laya.Handler.create(this, (sprite: Laya.Sprite3D) => {
             this._is3dObjLoaded = true;
             this._displayerObject3d = SceneManager.ins.container3d.addChild(sprite) as Laya.Sprite3D;
             this._displayerObject3d.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);

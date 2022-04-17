@@ -1,8 +1,15 @@
+import ActorTable from "../data/ActorTable";
+import DataManager from "../data/DataManager";
 import ActorProperty from "../property/ActorProperty";
 import ActorPropertyManager from "../property/ActorPropertyManager";
 import { ActorCamp, ActorType } from "./ActorType";
 
 export default class ActorBase {
+    protected _templateId:number;
+    protected _templateData:ActorTable;
+    public get templateData():ActorTable{
+        return this._templateData;
+    }
     protected _type: ActorType;
     public get type(): ActorType {
         return this._type;
@@ -11,9 +18,11 @@ export default class ActorBase {
     public get camp(): ActorCamp {
         return this._camp;
     }
-    constructor(type: ActorType, camp: ActorCamp) {
+    constructor(templateId:number,type: ActorType, camp: ActorCamp) {
         this._type = type;
         this._camp = camp;
+        this._templateId = templateId;
+        this._templateData = DataManager.ins.actorContainer.getActorById(templateId);
         }
 
     public isActorType(type: ActorType): boolean {

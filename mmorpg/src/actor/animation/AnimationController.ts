@@ -1,4 +1,5 @@
 import ActorBase from "../ActorBase";
+import DataFactory from "../DataFactory";
 
 export default class AnimationController {
     private _animator: Laya.Animator;
@@ -6,8 +7,11 @@ export default class AnimationController {
     private _keyframeHandler: Laya.Handler;
     private _keyframe: number = -1;
     private _isPlaying: boolean;
-    constructor(animator: Laya.Animator) {
+    private _aniMap: Map<string, number>;
+    constructor(animator: Laya.Animator, aniMap: Map<string,number>) {
         this._animator = animator;
+        this._aniMap = aniMap;
+
     }
 
     playAni(name: string, isLoop: boolean = false, completeHandler: Laya.Handler = null) {
@@ -38,6 +42,29 @@ export default class AnimationController {
                     this.onAniFinish();
                 }
             })
+        }
+    }
+
+    playAniById(actionId: number, keyframeHandler: Laya.Handler = null, completeHandler: Laya.Handler = null){
+        let action = DataFactory.getActionById(actionId);
+        if(action){
+            this._animator.play(action.name);
+            this._completeHandler = completeHandler;
+            Laya.timer.frameLoop(1, this, () => {
+                console.log(this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime);
+                if (this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime >= 1) {
+                    this.onAniFinish();
+                }
+            })
+        }
+    }
+
+    playAniByState(state: string, keyframeHandler: Laya.Handler = null, completeHandler:Laya.Handler = null){
+        let actionId: number = this._aniMap.get(state);
+        if (actionId){
+            this.playAniById(actionId, keyframeHandler, completeHandler);
+        }else{
+            console.warn("can't find actionId for: " + state);
         }
     }
 

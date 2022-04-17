@@ -4,6 +4,10 @@ import StateMachine from "../core/StateMachine";
 import { ActorType, ActorCamp } from "./ActorType";
 import DisplayObjectController from "./DisplayObjectController";
 import State from "../core/State";
+import { ActorPropertyType } from "../property/ActorPropertyType";
+import DataManager from "../data/DataManager";
+import DataFactory from "./DataFactory";
+import ActionTable from "../data/ActionTable";
 
 export default class Actor extends ActorBase {
     protected _displayObjectController: DisplayObjectController;
@@ -12,7 +16,7 @@ export default class Actor extends ActorBase {
     }
 
     protected _stateMachine: StateMachine;
-    public get stateMachine(): StateMachine{
+    public get stateMachine(): StateMachine {
         return this._stateMachine;
     }
 
@@ -21,18 +25,33 @@ export default class Actor extends ActorBase {
         return this._propertyManager;
     }
 
-    constructor(type: ActorType, camp: ActorCamp) {
-        super(type, camp);
+    constructor(templateId: number, type: ActorType, camp: ActorCamp) {
+        super(templateId, type, camp);
         this.registerStates();
-        this._propertyManager = new ActorPropertyManager(this);
+        this.initProperty();
         this._displayObjectController = new DisplayObjectController(this);
     }
 
-    registerStates():void{
+    registerStates(): void {
         this._stateMachine = new StateMachine(this);
     }
 
-    changeState(stateKey:string,obj:Object=null):void{
+    protected _actionMap:Map<string,number> = new Map();
+    registerAction():void{
+        let res = DataFactory.getActionBeans(this._templateId);
+        res.forEach((action)=>{
+            this._actionMap.set(action.name, action.actionId)
+        })
+        
+    }
+
+    initProperty(): void {
+        this._propertyManager = new ActorPropertyManager(this);
+        this._propertyManager.setBaseProperty(ActorPropertyType.HP, this._templateData.hp);
+        this._propertyManager.setBaseProperty(ActorPropertyType.Atk, this._templateData.atk);
+    }
+
+    changeState(stateKey: string, obj: Object = null): void {
         if (this._stateMachine) {
             this._stateMachine.changeState(stateKey, obj)
         }

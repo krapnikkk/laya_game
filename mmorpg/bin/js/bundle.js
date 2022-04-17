@@ -100,17 +100,64 @@ var polea = (() => {
     }
   };
 
+  // src/data/ActorTable.ts
+  var ActorTable = class {
+  };
+
+  // src/data/ActorContainer.ts
+  var ActorContainer = class {
+    constructor() {
+      this._actorMap = new Map();
+      let a1 = new ActorTable();
+      a1.id = 1e3;
+      a1.hp = 1e4;
+      a1.atk = 20;
+      a1.file2d = "./res/player.png";
+      a1.file3d = "./res/3dScene/cike/Conventional/cike.lh";
+      this._actorMap.set(a1.id, a1);
+    }
+    getActorById(id) {
+      if (this._actorMap.has(id)) {
+        return this._actorMap.get(id);
+      } else {
+        console.warn("can't not find actor by id:" + id);
+        return null;
+      }
+    }
+  };
+
+  // src/data/DataManager.ts
+  var DataManager = class {
+    constructor() {
+      this.actorContainer = new ActorContainer();
+      if (DataManager._ins) {
+        throw "singleton class is not use new constructor!";
+      }
+    }
+    static get ins() {
+      if (this._ins == null) {
+        this._ins = new DataManager();
+      }
+      return this._ins;
+    }
+  };
+
   // src/actor/ActorBase.ts
   var ActorBase = class {
+    get templateData() {
+      return this._templateData;
+    }
     get type() {
       return this._type;
     }
     get camp() {
       return this._camp;
     }
-    constructor(type, camp) {
+    constructor(templateId, type, camp) {
       this._type = type;
       this._camp = camp;
+      this._templateId = templateId;
+      this._templateData = DataManager.ins.actorContainer.getActorById(templateId);
     }
     isActorType(type) {
       return this._type == type;
@@ -531,13 +578,13 @@ var polea = (() => {
     }
     create2dObj() {
       this._displayerObject = new Laya.Sprite();
-      let child = Laya.Sprite.fromImage("./res/player.png");
+      let child = Laya.Sprite.fromImage(this._owner.templateData.file2d);
       this.displayObject.addChild(child);
       child.x -= 48;
       child.y -= 48;
     }
     create3dObj() {
-      Laya.Sprite3D.load("./res/3dScene/cike/Conventional/cike.lh", Laya.Handler.create(this, (sprite) => {
+      Laya.Sprite3D.load(this._owner.templateData.file3d, Laya.Handler.create(this, (sprite) => {
         this._is3dObjLoaded = true;
         this._displayerObject3d = SceneManager.ins.container3d.addChild(sprite);
         this._displayerObject3d.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
@@ -586,14 +633,19 @@ var polea = (() => {
     get propertyManager() {
       return this._propertyManager;
     }
-    constructor(type, camp) {
-      super(type, camp);
+    constructor(templateId, type, camp) {
+      super(templateId, type, camp);
       this.registerStates();
-      this._propertyManager = new ActorPropertyManager(this);
+      this.initProperty();
       this._displayObjectController = new DisplayObjectController(this);
     }
     registerStates() {
       this._stateMachine = new StateMachine(this);
+    }
+    initProperty() {
+      this._propertyManager = new ActorPropertyManager(this);
+      this._propertyManager.setBaseProperty(ActorPropertyType.HP, this._templateData.hp);
+      this._propertyManager.setBaseProperty(ActorPropertyType.Atk, this._templateData.atk);
     }
     changeState(stateKey, obj = null) {
       if (this._stateMachine) {
@@ -698,12 +750,12 @@ var polea = (() => {
   var Player = class extends Actor {
     static get ins() {
       if (this._ins == null) {
-        this._ins = new Player(ActorType.PLAYER, ActorCamp.PLAYER);
+        this._ins = new Player(1e3, ActorType.PLAYER, ActorCamp.PLAYER);
       }
       return this._ins;
     }
-    constructor(type, camp) {
-      super(type, camp);
+    constructor(templateId, type, camp) {
+      super(templateId, type, camp);
       if (Player._ins) {
         throw "singleton class is not use new constructor!";
       }
