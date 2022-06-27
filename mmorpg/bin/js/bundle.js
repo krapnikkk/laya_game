@@ -100,6 +100,34 @@ var polea = (() => {
     }
   };
 
+  // src/data/ActionTable.ts
+  var ActionTable = class {
+  };
+
+  // src/data/ActionContainer.ts
+  var ActionContainer = class {
+    constructor() {
+      this._actionMap = new Map();
+      let action = new ActionTable();
+      action.ownerId = 1e3;
+      action.actionId = 1e4;
+      action.name = ActorState.IDLE;
+      action.isLoop = true;
+      this._actionMap.set(action.actionId, action);
+    }
+    get actionMap() {
+      return this._actionMap;
+    }
+    getActionById(id) {
+      if (this._actionMap.has(id)) {
+        return this._actionMap.get(id);
+      } else {
+        console.warn("can't not find action by id:" + id);
+        return null;
+      }
+    }
+  };
+
   // src/data/ActorTable.ts
   var ActorTable = class {
   };
@@ -116,6 +144,9 @@ var polea = (() => {
       a1.file3d = "./res/3dScene/cike/Conventional/cike.lh";
       this._actorMap.set(a1.id, a1);
     }
+    get actorMap() {
+      return this._actorMap;
+    }
     getActorById(id) {
       if (this._actorMap.has(id)) {
         return this._actorMap.get(id);
@@ -130,6 +161,7 @@ var polea = (() => {
   var DataManager = class {
     constructor() {
       this.actorContainer = new ActorContainer();
+      this.actionContainer = new ActionContainer();
       if (DataManager._ins) {
         throw "singleton class is not use new constructor!";
       }
@@ -139,6 +171,36 @@ var polea = (() => {
         this._ins = new DataManager();
       }
       return this._ins;
+    }
+  };
+
+  // src/data/DataFactory.ts
+  var DataFactory = class {
+    constructor() {
+    }
+    static getActionById(id) {
+      let action = DataManager.ins.actionContainer.getActionById(id);
+      if (action == null) {
+        console.warn("\u627E\u4E0D\u5230\u6A21\u677F\u6570\u636E\uFF1A" + id);
+      }
+      return action;
+    }
+    static getActorById(id) {
+      let actor = DataManager.ins.actorContainer.getActorById(id);
+      if (actor == null) {
+        console.warn("\u627E\u4E0D\u5230\u89D2\u8272\u6A21\u677F\u6570\u636E\uFF1A" + id);
+      }
+      return actor;
+    }
+    static getActionData(ownerId) {
+      let res = [];
+      let dict = DataManager.ins.actionContainer.actionMap;
+      for (let key in dict) {
+        if (dict[key].ownerId == ownerId) {
+          res.push(dict[key]);
+        }
+      }
+      return res;
     }
   };
 
@@ -157,7 +219,7 @@ var polea = (() => {
       this._type = type;
       this._camp = camp;
       this._templateId = templateId;
-      this._templateData = DataManager.ins.actorContainer.getActorById(templateId);
+      this._templateData = DataFactory.getActorById(templateId);
     }
     isActorType(type) {
       return this._type == type;
@@ -221,11 +283,31 @@ var polea = (() => {
   var StateMachine = _StateMachine;
   StateMachine.InvalidState = "InvalidState";
 
+  // src/Utils.ts
+  var angleToRandin = (angle) => {
+    return angle * Math.PI / 180;
+  };
+  var isNullOrEmpty = (str) => {
+    if (str != null) {
+      str = str.trim();
+      if (str.length > 0) {
+        return false;
+      }
+    }
+    return true;
+  };
+  var splitStrToIntArr = (str, splitStr = "+") => {
+    let arr = str.split(splitStr);
+    return arr.map((item) => {
+      return +item;
+    });
+  };
+
   // src/actor/animation/AnimationController.ts
   var AnimationController = class {
-    constructor(animator) {
-      this._keyframe = -1;
+    constructor(animator, actionMap) {
       this._animator = animator;
+      this._actionMap = actionMap;
     }
     playAni(name, isLoop = false, completeHandler = null) {
       if (this._animator) {
@@ -238,6 +320,31 @@ var polea = (() => {
         });
       }
     }
+    playAniById(actionId, keyframeHandler = null, completeHandler = null) {
+      let action = DataFactory.getActionById(actionId);
+      if (action) {
+        this._isPlaying = true;
+        let keyframe = action.keyFrame;
+        if (isNullOrEmpty(keyframe)) {
+          this._keyFrames = splitStrToIntArr(keyframe);
+        }
+        this._animator.play(action.name);
+        this._completeHandler = completeHandler;
+        Laya.timer.frameLoop(1, this, () => {
+          if (this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime >= 1) {
+            this.onAniFinish();
+          }
+        });
+      }
+    }
+    playAniByState(state, keyframeHandler = null, completeHandler = null) {
+      let actionId = this._actionMap.get(state);
+      if (actionId) {
+        this.playAniById(actionId, keyframeHandler, completeHandler);
+      } else {
+        console.warn("can't find actionId for: " + state);
+      }
+    }
     onAniFinish() {
       if (this._completeHandler) {
         this._completeHandler.run();
@@ -247,11 +354,10 @@ var polea = (() => {
     stop() {
       this._keyframeHandler = null;
       this._completeHandler = null;
-      this._keyframe = -1;
     }
     update() {
       if (this._isPlaying) {
-        if (this._keyframe > 0 && this._keyframeHandler) {
+        if (this._keyframeHandler) {
           this._keyframeHandler.run();
           this._keyframeHandler = null;
         }
@@ -458,11 +564,6 @@ var polea = (() => {
     }
   };
 
-  // src/Utils.ts
-  var angleToRandin = (angle) => {
-    return angle * Math.PI / 180;
-  };
-
   // src/scene/SceneManager.ts
   var SceneManager = class {
     constructor() {
@@ -590,7 +691,7 @@ var polea = (() => {
         this._displayerObject3d.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
         this._displayerObject3d.transform.localScale = new Laya.Vector3(0.05, 0.05, 0.05);
         let animator = sprite.getComponent(Laya.Animator);
-        this._animationController = new AnimationController(animator);
+        this._animationController = new AnimationController(animator, this._owner.actionMap);
       }));
     }
     update() {
@@ -624,6 +725,14 @@ var polea = (() => {
 
   // src/actor/Actor.ts
   var Actor = class extends ActorBase {
+    constructor(templateId, type, camp) {
+      super(templateId, type, camp);
+      this._actionMap = new Map();
+      this.registerStates();
+      this.registerActions();
+      this.initProperty();
+      this._displayObjectController = new DisplayObjectController(this);
+    }
     get displayObjectController() {
       return this._displayObjectController;
     }
@@ -633,14 +742,17 @@ var polea = (() => {
     get propertyManager() {
       return this._propertyManager;
     }
-    constructor(templateId, type, camp) {
-      super(templateId, type, camp);
-      this.registerStates();
-      this.initProperty();
-      this._displayObjectController = new DisplayObjectController(this);
-    }
     registerStates() {
       this._stateMachine = new StateMachine(this);
+    }
+    get actionMap() {
+      return this._actionMap;
+    }
+    registerActions() {
+      let res = DataFactory.getActionData(this._templateId);
+      res.forEach((action) => {
+        this._actionMap.set(action.name, action.actionId);
+      });
     }
     initProperty() {
       this._propertyManager = new ActorPropertyManager(this);

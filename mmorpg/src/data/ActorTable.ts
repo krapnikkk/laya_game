@@ -6,4 +6,5 @@ export default class ActorTable{
     public file2d:string;
     public file3d:string;
     public fileAni:string;
+    public meshName:string;
 }

@@ -1,7 +1,7 @@
-import ActionTable from "../data/ActionTable";
-import ActorTable from "../data/ActorTable";
-import DataManager from "../data/DataManager";
-import Actor from "./Actor";
+import ActionTable from "./ActionTable";
+import ActorTable from "./ActorTable";
+import DataManager from "./DataManager";
+import Actor from "../actor/Actor";
 
 export default class DataFactory {
     constructor() {
@@ -24,12 +24,12 @@ export default class DataFactory {
         return actor;
     }
 
-    static getActionBeans(ownerId: number): ActionTable[] {
+    static getActionData(ownerId: number): ActionTable[] {
         let res: ActionTable[] = [];
         let dict = DataManager.ins.actionContainer.actionMap;
-        for (let [key, value] of dict.entries()) {
-            if (value.ownerId == ownerId) {
-                res.push(value);
+        for (let key in dict) {
+            if (dict[key].ownerId == ownerId) {
+                res.push(dict[key]);
             }
         }
         return res;

@@ -1,16 +1,17 @@
 import ActorBase from "../ActorBase";
-import DataFactory from "../DataFactory";
+import DataFactory from "../../data/DataFactory";
+import { isNullOrEmpty, splitStrToIntArr } from "../../Utils";
 
 export default class AnimationController {
     private _animator: Laya.Animator;
     private _completeHandler: Laya.Handler;
     private _keyframeHandler: Laya.Handler;
-    private _keyframe: number = -1;
     private _isPlaying: boolean;
-    private _aniMap: Map<string, number>;
-    constructor(animator: Laya.Animator, aniMap: Map<string,number>) {
+    private _actionMap: Map<string, number>;
+    private _keyFrames: Array<number>;
+    constructor(animator: Laya.Animator, actionMap: Map<string, number>) {
         this._animator = animator;
-        this._aniMap = aniMap;
+        this._actionMap = actionMap;
 
     }
 
@@ -37,7 +38,7 @@ export default class AnimationController {
             // this._animator.addState(state);
             //播放动画
             this._animator.play(name);
-            Laya.timer.frameLoop(1, this, ()=> {
+            Laya.timer.frameLoop(1, this, () => {
                 if (this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime >= 1) {
                     this.onAniFinish();
                 }
@@ -45,13 +46,17 @@ export default class AnimationController {
         }
     }
 
-    playAniById(actionId: number, keyframeHandler: Laya.Handler = null, completeHandler: Laya.Handler = null){
+    playAniById(actionId: number, keyframeHandler: Laya.Handler = null, completeHandler: Laya.Handler = null) {
         let action = DataFactory.getActionById(actionId);
-        if(action){
+        if (action) {
+            this._isPlaying = true;
+            let keyframe = action.keyFrame;
+            if (isNullOrEmpty(keyframe)) {
+                this._keyFrames = splitStrToIntArr(keyframe);
+            }
             this._animator.play(action.name);
             this._completeHandler = completeHandler;
             Laya.timer.frameLoop(1, this, () => {
-                console.log(this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime);
                 if (this._animator.getControllerLayer(0).getCurrentPlayState().normalizedTime >= 1) {
                     this.onAniFinish();
                 }
@@ -59,11 +64,11 @@ export default class AnimationController {
         }
     }
 
-    playAniByState(state: string, keyframeHandler: Laya.Handler = null, completeHandler:Laya.Handler = null){
-        let actionId: number = this._aniMap.get(state);
-        if (actionId){
+    playAniByState(state: string, keyframeHandler: Laya.Handler = null, completeHandler: Laya.Handler = null) {
+        let actionId: number = this._actionMap.get(state);
+        if (actionId) {
             this.playAniById(actionId, keyframeHandler, completeHandler);
-        }else{
+        } else {
             console.warn("can't find actionId for: " + state);
         }
     }
@@ -79,12 +84,11 @@ export default class AnimationController {
     private stop(): void {
         this._keyframeHandler = null;
         this._completeHandler = null;
-        this._keyframe = -1;
     }
 
     public update(): void {
         if (this._isPlaying) {
-            if (this._keyframe > 0 && this._keyframeHandler) {
+            if (this._keyframeHandler) {
                 this._keyframeHandler.run();
                 this._keyframeHandler = null;
             }

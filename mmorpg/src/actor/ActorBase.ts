@@ -3,6 +3,7 @@ import DataManager from "../data/DataManager";
 import ActorProperty from "../property/ActorProperty";
 import ActorPropertyManager from "../property/ActorPropertyManager";
 import { ActorCamp, ActorType } from "./ActorType";
+import DataFactory from "../data/DataFactory";
 
 export default class ActorBase {
     protected _templateId:number;
@@ -22,7 +23,7 @@ export default class ActorBase {
         this._type = type;
         this._camp = camp;
         this._templateId = templateId;
-        this._templateData = DataManager.ins.actorContainer.getActorById(templateId);
+        this._templateData = DataFactory.getActorById(templateId);
         }
 
     public isActorType(type: ActorType): boolean {

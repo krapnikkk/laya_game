@@ -5,9 +5,7 @@ import { ActorType, ActorCamp } from "./ActorType";
 import DisplayObjectController from "./DisplayObjectController";
 import State from "../core/State";
 import { ActorPropertyType } from "../property/ActorPropertyType";
-import DataManager from "../data/DataManager";
-import DataFactory from "./DataFactory";
-import ActionTable from "../data/ActionTable";
+import DataFactory from "../data/DataFactory";
 
 export default class Actor extends ActorBase {
     protected _displayObjectController: DisplayObjectController;
@@ -28,6 +26,7 @@ export default class Actor extends ActorBase {
     constructor(templateId: number, type: ActorType, camp: ActorCamp) {
         super(templateId, type, camp);
         this.registerStates();
+        this.registerActions();
         this.initProperty();
         this._displayObjectController = new DisplayObjectController(this);
     }
@@ -36,9 +35,12 @@ export default class Actor extends ActorBase {
         this._stateMachine = new StateMachine(this);
     }
 
-    protected _actionMap:Map<string,number> = new Map();
-    registerAction():void{
-        let res = DataFactory.getActionBeans(this._templateId);
+    protected _actionMap: Map<string, number> = new Map();
+    public get actionMap(): Map<string, number> {
+        return this._actionMap;
+    }
+    registerActions():void{
+        let res = DataFactory.getActionData(this._templateId);
         res.forEach((action)=>{
             this._actionMap.set(action.name, action.actionId)
         })
